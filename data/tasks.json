@@ -1,0 +1,27 @@
+{
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Build Kanban Board",
+      "description": "Create Next.js Kanban board as single source of truth",
+      "priority": "High",
+      "tags": [
+        "project",
+        "nextjs"
+      ],
+      "status": "done",
+      "createdAt": "2026-02-13T18:50:00.000Z",
+      "updatedAt": "2026-02-13T19:11:43.596Z"
+    },
+    {
+      "title": "Install Models",
+      "description": "List all the models in anthropic support for openclaw and install them",
+      "priority": "Med",
+      "status": "done",
+      "tags": [],
+      "id": "task-1771009647539",
+      "createdAt": "2026-02-13T19:07:27.539Z",
+      "updatedAt": "2026-02-13T19:11:39.579Z"
+    }
+  ]
+}
