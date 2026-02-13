@@ -149,7 +149,7 @@ export function KanbanBoard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading tasks...</div>
+        <div className="text-gray-400">Loading tasks...</div>
       </div>
     );
   }
@@ -158,8 +158,8 @@ export function KanbanBoard() {
     <div className="h-full">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Kanban Board</h1>
-          <p className="text-gray-500 text-sm">Single source of truth for all work</p>
+          <h1 className="text-2xl font-bold text-white">📋 Kanban Board</h1>
+          <p className="text-gray-400 text-sm">Single source of truth for all work</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -173,7 +173,7 @@ export function KanbanBoard() {
           </button>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -13,12 +13,12 @@ interface ColumnProps {
 }
 
 const COLUMN_COLORS: Record<Status, string> = {
-  'backlog': 'border-t-gray-400',
-  'planned': 'border-t-blue-400',
-  'in-progress': 'border-t-yellow-400',
-  'blocked': 'border-t-red-400',
-  'review': 'border-t-purple-400',
-  'done': 'border-t-green-400',
+  'backlog': 'border-t-gray-500',
+  'planned': 'border-t-blue-500',
+  'in-progress': 'border-t-yellow-500',
+  'blocked': 'border-t-red-500',
+  'review': 'border-t-purple-500',
+  'done': 'border-t-green-500',
 };
 
 export function Column({ id, title, tasks, onEditTask }: ColumnProps) {
@@ -27,14 +27,14 @@ export function Column({ id, title, tasks, onEditTask }: ColumnProps) {
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 min-w-[280px] max-w-[320px] bg-gray-50 rounded-lg border-t-4 ${COLUMN_COLORS[id]} ${
-        isOver ? 'ring-2 ring-blue-400 ring-opacity-50' : ''
+      className={`flex-1 min-w-[280px] max-w-[320px] bg-gray-900 rounded-xl border border-gray-800 border-t-4 ${COLUMN_COLORS[id]} ${
+        isOver ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
       }`}
     >
-      <div className="p-3 border-b border-gray-200">
+      <div className="p-3 border-b border-gray-800">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-700">{title}</h2>
-          <span className="bg-gray-200 text-gray-600 text-xs font-medium px-2 py-1 rounded-full">
+          <h2 className="font-semibold text-gray-200">{title}</h2>
+          <span className="bg-gray-800 text-gray-400 text-xs font-medium px-2 py-1 rounded-full">
             {tasks.length}
           </span>
         </div>
@@ -48,7 +48,7 @@ export function Column({ id, title, tasks, onEditTask }: ColumnProps) {
         </SortableContext>
         
         {tasks.length === 0 && (
-          <div className="text-center py-8 text-gray-400 text-sm">
+          <div className="text-center py-8 text-gray-600 text-sm">
             Drop tasks here
           </div>
         )}
