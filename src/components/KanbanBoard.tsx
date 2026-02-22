@@ -340,15 +340,15 @@ export function KanbanBoard() {
         <div className="border-b border-gray-800 bg-gray-900/50 px-4 lg:px-6 py-3 md:py-4 flex-shrink-0">
           <div className="flex items-center justify-between gap-2 md:gap-4">
             {/* Left: Search Bar - Responsive width */}
-            <div className="flex items-center gap-2 md:gap-4 flex-1">
-              <div className="relative flex-1 md:flex-none">
+            <div className="flex items-center gap-2 md:gap-4 flex-1 max-w-[120px] md:max-w-none">
+              <div className="relative w-full md:w-64">
                 <svg className="w-4 h-4 md:w-5 md:h-5 absolute left-2 md:left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="pl-8 md:pl-10 pr-2 md:pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 w-full md:w-64 text-sm"
+                  className="pl-8 md:pl-10 pr-2 md:pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 w-full text-sm"
                 />
               </div>
               
