@@ -290,7 +290,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
           {activeTab === 'images' && (
             <div className="space-y-4">
               {task.images && task.images.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-2">
                   {task.images.map((img, idx) => (
                     <div key={idx} className="relative aspect-square bg-gray-800 rounded-lg overflow-hidden group">
                       <img 
