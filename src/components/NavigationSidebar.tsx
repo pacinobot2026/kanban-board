@@ -10,10 +10,12 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
+  { id: 'video', label: 'Video Board', icon: '🎬', href: 'https://vizard-clips-app.vercel.app/dashboard' },
+  { id: 'articles', label: 'Article Board', icon: '📰', href: 'https://vizard-clips-app.vercel.app/articles' },
+  { id: 'ideas', label: 'Idea Board', icon: '💡', href: 'https://vizard-clips-app.vercel.app/ideas' },
+  { id: 'control', label: 'Command Center', icon: '🎛️', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
   { id: 'team', label: 'Team Board', icon: '👥', href: '/' },
-  { id: 'openclaw', label: 'OpenClaw Board', icon: '🤖', href: '/openclaw' },
-  { id: 'video', label: 'Video Board', icon: '🎬', href: 'https://vizard-clips-app.vercel.app' },
-  { id: 'control', label: 'Control Panel', icon: '🎛️', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
+  { id: 'openclaw', label: 'OpenClaw Board', icon: '🤖', href: 'https://vizard-clips-app.vercel.app/openclaw' },
 ];
 
 export function NavigationSidebar() {

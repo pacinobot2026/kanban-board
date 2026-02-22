@@ -40,6 +40,7 @@ export function KanbanBoard() {
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [initialStatus, setInitialStatus] = useState<Status | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -271,6 +272,56 @@ export function KanbanBoard() {
     <div className="flex h-screen bg-gray-950 overflow-hidden">
       {/* Far Left - Navigation Sidebar */}
       <NavigationSidebar />
+      
+      {/* Hamburger Menu - Top Right */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="hamburger-menu fixed top-4 right-4 z-[1001] bg-gray-800 border border-gray-700 rounded-lg p-3 text-white cursor-pointer shadow-lg"
+      >
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      {/* Publications Menu Dropdown */}
+      {mobileMenuOpen && (
+        <>
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/50 z-[999]"
+          />
+          <div className="fixed top-[72px] right-4 bg-gray-800 border border-gray-700 rounded-xl p-2 z-[1000] min-w-[200px] shadow-xl">
+            <div className="px-3 py-2 text-gray-400 text-xs font-semibold uppercase">
+              Publications
+            </div>
+            <a href="https://vizard-clips-app.vercel.app/dashboard" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
+              <span className="text-xl">🎬</span>
+              <span className="text-sm">Video Board</span>
+            </a>
+            <a href="https://vizard-clips-app.vercel.app/articles" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
+              <span className="text-xl">📰</span>
+              <span className="text-sm">Article Board</span>
+            </a>
+            <a href="https://vizard-clips-app.vercel.app/ideas" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
+              <span className="text-xl">💡</span>
+              <span className="text-sm">Idea Board</span>
+            </a>
+            <div className="h-px bg-gray-700 my-2" />
+            <a href="https://dashboard-gilt-one-zc4y5uu95v.vercel.app" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
+              <span className="text-xl">🎛️</span>
+              <span className="text-sm">Command Center</span>
+            </a>
+            <a href="https://kanban-rho-ivory.vercel.app" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg bg-purple-900/20 transition-colors">
+              <span className="text-xl">👥</span>
+              <span className="text-sm">Team Board</span>
+            </a>
+            <a href="https://vizard-clips-app.vercel.app/openclaw" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
+              <span className="text-xl">🤖</span>
+              <span className="text-sm">OpenClaw Board</span>
+            </a>
+          </div>
+        </>
+      )}
 
       {/* Left Sidebar - Projects */}
       <div className="hidden lg:block">
