@@ -13,7 +13,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'team', label: 'Team Board', icon: '👥', href: '/' },
   { id: 'openclaw', label: 'OpenClaw Board', icon: '🤖', href: '/openclaw' },
   { id: 'video', label: 'Video Board', icon: '🎬', href: 'https://vizard-clips-app.vercel.app' },
-  { id: 'control', label: 'Control Panel', icon: '🎛️', href: 'https://skill2-dashboard.vercel.app' },
+  { id: 'control', label: 'Control Panel', icon: '🎛️', href: 'https://dashboard-rho-ivory.vercel.app' },
 ];
 
 export function NavigationSidebar() {
@@ -50,6 +50,8 @@ export function NavigationSidebar() {
           <a
             key={item.id}
             href={item.href}
+            target={item.href.startsWith('http') ? '_blank' : undefined}
+            rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
             className={`relative flex items-center gap-3 px-3 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors group ${
               item.id === 'team' ? 'bg-purple-900/30 border-r-2 border-purple-500' : ''
             }`}
