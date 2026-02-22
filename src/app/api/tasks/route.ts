@@ -34,8 +34,11 @@ export async function POST(request: NextRequest) {
     
     // Handle updateAll action
     if (body.action === 'updateAll' && body.tasks) {
+      console.log('API: Saving tasks:', body.tasks.length);
+      console.log('API: First task has images:', body.tasks[0]?.images?.length || 0);
       await writeTasks(body.tasks);
-      return NextResponse.json({ success: true });
+      console.log('API: Save complete');
+      return NextResponse.json({ success: true, savedTasks: body.tasks.length });
     }
     
     // Handle regular task creation
