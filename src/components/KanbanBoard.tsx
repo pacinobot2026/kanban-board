@@ -12,10 +12,12 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { Task, Status, COLUMNS } from '@/types/task';
+import { Task, Status, COLUMNS, PROJECTS, TaskType } from '@/types/task';
 import { Column } from './Column';
 import { TaskCard } from './TaskCard';
 import { TaskModal } from './TaskModal';
+import { ProjectSidebar } from './ProjectSidebar';
+import { ActivityFeed } from './ActivityFeed';
 
 export function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -23,6 +25,11 @@ export function KanbanBoard() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<TaskType | 'all'>('all');
+  const [showProjectSidebar, setShowProjectSidebar] = useState(false);
+  const [showActivityFeed, setShowActivityFeed] = useState(false);
+  const [showMobileActivity, setShowMobileActivity] = useState(false);
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -36,7 +43,7 @@ export function KanbanBoard() {
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(PointerSensor,{
       activationConstraint: { distance: 8 },
     })
   );
@@ -94,7 +101,7 @@ export function KanbanBoard() {
     const activeTask = tasks.find(t => t.id === active.id);
     if (!activeTask) return;
 
-    // Save the updated status
+    // Save the updated status to database
     try {
       await fetch('/api/tasks', {
         method: 'PATCH',
@@ -142,9 +149,25 @@ export function KanbanBoard() {
     setIsModalOpen(true);
   };
 
-  const getTasksByStatus = (status: Status) => {
-    return tasks.filter(t => t.status === status);
+  const handleSelectProject = (projectId: string | null) => {
+    setSelectedProject(projectId);
+    setShowProjectSidebar(false); // Close on mobile after selection
   };
+
+  const filteredTasks = tasks.filter(t => {
+    const projectMatch = selectedProject ? t.project === selectedProject : true;
+    const typeMatch = typeFilter === 'all' ? true : t.type === typeFilter;
+    return projectMatch && typeMatch;
+  });
+
+  const getTasksByStatus = (status: Status) => {
+    return filteredTasks.filter(t => t.status === status);
+  };
+
+  const projectCounts = PROJECTS.map(project => ({
+    ...project,
+    count: tasks.filter(t => t.project === project.id).length,
+  }));
 
   if (loading) {
     return (
@@ -155,58 +178,176 @@ export function KanbanBoard() {
   }
 
   return (
-    <div className="h-full">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">📋 Kanban Board</h1>
-          <p className="text-gray-400 text-sm">Single source of truth for all work</p>
+    <div className="flex h-screen bg-gray-950 overflow-hidden">
+      {/* Left Sidebar - Projects (Desktop always visible, Mobile slide-in) */}
+      <div className={`
+        fixed lg:relative inset-y-0 left-0 z-30 transform transition-transform duration-300
+        ${showProjectSidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <ProjectSidebar
+          projects={projectCounts}
+          selectedProject={selectedProject}
+          onSelectProject={handleSelectProject}
+        />
+      </div>
+
+      {/* Overlay for mobile */}
+      {showProjectSidebar && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+          onClick={() => setShowProjectSidebar(false)}
+        />
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="border-b border-gray-800 bg-gray-900/50 px-4 lg:px-6 py-4 flex-shrink-0">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setShowProjectSidebar(true)}
+                className="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg lg:text-xl font-bold text-white flex items-center gap-2 truncate">
+                  📋 Projects
+                  {selectedProject && (
+                    <>
+                      <span className="hidden sm:inline text-sm text-gray-400">/</span>
+                      <span className="text-sm text-gray-400 truncate">
+                        {PROJECTS.find(p => p.id === selectedProject)?.name}
+                      </span>
+                    </>
+                  )}
+                </h1>
+                <p className="text-gray-400 text-xs sm:text-sm mt-1">
+                  {filteredTasks.length} tasks
+                </p>
+              </div>
+            </div>
+
+            {/* Team/OpenClaw Filter */}
+            <div className="hidden md:flex items-center bg-gray-800 rounded-lg p-1">
+              {(['all', 'team', 'openclaw'] as const).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setTypeFilter(type)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    typeFilter === type
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  {type === 'all' ? 'All' : type === 'team' ? 'Team' : 'OpenClaw'}
+                </button>
+              ))}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* Bell button (mobile only) */}
+              <button
+                onClick={() => setShowMobileActivity(true)}
+                className="xl:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors relative"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {tasks.filter(t => t.status === 'in-progress').length > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full"></span>
+                )}
+              </button>
+              
+              <button
+                onClick={handleNewTask}
+                className="px-3 lg:px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all flex items-center gap-2 shadow-lg text-sm lg:text-base"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="hidden sm:inline">Add</span>
+              </button>
+              
+              <button
+                onClick={handleLogout}
+                className="hidden sm:flex px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors items-center gap-2 text-sm lg:text-base"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleNewTask}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+
+        {/* Kanban Board */}
+        <div className="flex-1 overflow-hidden">
+          <DndContext
+            sensors={sensors}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Task
-          </button>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Logout
-          </button>
+            <div className="h-full overflow-x-auto overflow-y-hidden">
+              <div className="flex gap-3 lg:gap-4 p-4 lg:p-6 min-w-max h-full">
+                {COLUMNS.map(column => (
+                  <Column
+                    key={column.id}
+                    id={column.id}
+                    title={column.title}
+                    tasks={getTasksByStatus(column.id)}
+                    onEditTask={handleEditTask}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <DragOverlay>
+              {activeTask && (
+                <TaskCard task={activeTask} onEdit={() => {}} />
+              )}
+            </DragOverlay>
+          </DndContext>
         </div>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {COLUMNS.map(column => (
-            <Column
-              key={column.id}
-              id={column.id}
-              title={column.title}
-              tasks={getTasksByStatus(column.id)}
-              onEditTask={handleEditTask}
-            />
-          ))}
-        </div>
+      {/* Right Sidebar - Activity (Desktop always visible) */}
+      <div className="hidden xl:block">
+        <ActivityFeed tasks={tasks} />
+      </div>
 
-        <DragOverlay>
-          {activeTask && (
-            <TaskCard task={activeTask} onEdit={() => {}} />
-          )}
-        </DragOverlay>
-      </DndContext>
+      {/* Mobile Activity Feed Overlay */}
+      {showMobileActivity && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 xl:hidden"
+            onClick={() => setShowMobileActivity(false)}
+          />
+          <div className="fixed inset-y-0 right-0 w-80 z-50 xl:hidden transform transition-transform">
+            <div className="h-full bg-gray-900 border-l border-gray-800 flex flex-col">
+              <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+                <h2 className="text-white font-bold text-lg">🔔 Activity</h2>
+                <button
+                  onClick={() => setShowMobileActivity(false)}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <ActivityFeed tasks={tasks} />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <TaskModal
         task={editingTask}

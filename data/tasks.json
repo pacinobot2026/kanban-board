@@ -22,6 +22,124 @@
       "id": "task-1771009647539",
       "createdAt": "2026-02-13T19:07:27.539Z",
       "updatedAt": "2026-02-13T19:11:39.579Z"
+    },
+    {
+      "id": "sample-1771715570403-0",
+      "title": "Customer Onboarding Flow Redesign",
+      "description": "Redesign the customer onboarding experience for MintBird to reduce drop-off",
+      "priority": "High",
+      "status": "inbox",
+      "project": "mintbird",
+      "tags": [
+        "UX",
+        "Design"
+      ],
+      "progress": 0,
+      "createdAt": "2026-02-21T23:12:50.402Z",
+      "updatedAt": "2026-02-21T23:12:50.402Z"
+    },
+    {
+      "id": "sample-1771715570403-1",
+      "title": "Security Vulnerability Scan",
+      "description": "Run comprehensive security audit on PopLinks infrastructure",
+      "priority": "High",
+      "status": "in-progress",
+      "project": "poplinks",
+      "assignee": "gaurav",
+      "tags": [
+        "Security",
+        "Infrastructure"
+      ],
+      "progress": 48,
+      "statusLabel": "DELAYED",
+      "daysSince": 64,
+      "dueDate": "2026-01-22",
+      "createdAt": "2025-12-19T23:12:50.402Z",
+      "updatedAt": "2026-02-21T23:12:50.402Z"
+    },
+    {
+      "id": "sample-1771715570403-2",
+      "title": "OpenClaw Dashboard Redesign",
+      "description": "Create modern dashboard with real-time analytics",
+      "priority": "Med",
+      "status": "review",
+      "project": "openclaw",
+      "assignee": "pacino",
+      "tags": [
+        "Frontend",
+        "Design"
+      ],
+      "progress": 100,
+      "statusLabel": "ON TRACK",
+      "createdAt": "2026-02-11T23:12:50.402Z",
+      "updatedAt": "2026-02-21T23:12:50.402Z"
+    },
+    {
+      "id": "sample-1771715570403-3",
+      "title": "Q4 Financial Report",
+      "description": "Comprehensive financial report for all products",
+      "priority": "High",
+      "status": "done",
+      "project": "entourage",
+      "assignee": "chad",
+      "tags": [
+        "Finance",
+        "Reporting"
+      ],
+      "progress": 100,
+      "createdAt": "2026-02-01T23:12:50.402Z",
+      "updatedAt": "2026-02-19T23:12:50.402Z"
+    },
+    {
+      "id": "sample-1771715570403-4",
+      "title": "Newsletter Automation System",
+      "description": "Build automated newsletter generation and distribution",
+      "priority": "Med",
+      "status": "in-progress",
+      "project": "letterman",
+      "assignee": "pacino",
+      "tags": [
+        "Automation",
+        "Content"
+      ],
+      "progress": 35,
+      "dueDate": "2026-03-07",
+      "createdAt": "2026-02-14T23:12:50.402Z",
+      "updatedAt": "2026-02-21T23:12:50.402Z"
+    },
+    {
+      "id": "sample-1771715570403-5",
+      "title": "Course Platform Mobile App",
+      "description": "Native mobile app for Course Sprout students",
+      "priority": "High",
+      "status": "assigned",
+      "project": "coursesprout",
+      "assignee": "pranay",
+      "tags": [
+        "Mobile",
+        "Development"
+      ],
+      "progress": 0,
+      "statusLabel": "CRITICAL",
+      "dueDate": "2026-02-28",
+      "createdAt": "2026-02-18T23:12:50.402Z",
+      "updatedAt": "2026-02-21T23:12:50.402Z"
+    },
+    {
+      "id": "sample-1771715570403-6",
+      "title": "Market Research Report",
+      "description": "Comprehensive market analysis for expansion",
+      "priority": "High",
+      "status": "inbox",
+      "project": "entourage",
+      "tags": [
+        "Research",
+        "Strategy"
+      ],
+      "statusLabel": "CRITICAL",
+      "daysSince": 54,
+      "createdAt": "2025-12-29T23:12:50.402Z",
+      "updatedAt": "2026-02-21T23:12:50.402Z"
     }
   ]
 }
