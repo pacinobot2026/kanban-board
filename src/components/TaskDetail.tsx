@@ -111,7 +111,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
         {/* Header with Tabs */}
         <div className="border-b border-gray-800 bg-gray-900/95 backdrop-blur">
           <div className="px-4 py-3 flex items-center justify-between">
-            <h2 className="text-white font-semibold">Task Details</h2>
+            <h2 className="text-white font-semibold">🚀 NEW VERSION - Task Details</h2>
             <button
               onClick={onClose}
               className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
