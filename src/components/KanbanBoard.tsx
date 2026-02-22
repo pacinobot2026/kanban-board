@@ -400,7 +400,7 @@ export function KanbanBoard() {
               </button>
               
               <button
-                onClick={handleNewTask}
+                onClick={() => handleNewTask()}
                 className="px-3 lg:px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all flex items-center gap-2 shadow-lg text-sm lg:text-base"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
