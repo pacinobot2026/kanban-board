@@ -25,6 +25,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
   const [progress, setProgress] = useState(0);
   const [dueDate, setDueDate] = useState('');
   const [newComment, setNewComment] = useState('');
+  const [newSubtaskText, setNewSubtaskText] = useState('');
 
   // Load task data when opened
   if (task && isOpen && title !== task.title) {
@@ -56,7 +57,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
 
   const assigneeInfo = assignee ? TEAM_MEMBERS.find(m => m.id === assignee) : null;
   
-  // Handle subtasks that might be stored as JSON string
+  // Handle subtasks
   const parsedSubtasks = (() => {
     if (!task.subtasks) return [];
     if (Array.isArray(task.subtasks)) return task.subtasks;
@@ -73,6 +74,24 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
   
   const completedSubtasks = parsedSubtasks.filter(s => s.completed).length;
   const totalSubtasks = parsedSubtasks.length;
+
+  const toggleSubtask = (subtaskId: string) => {
+    const updatedSubtasks = parsedSubtasks.map(s => 
+      s.id === subtaskId ? { ...s, completed: !s.completed } : s
+    );
+    onSave({ ...task, subtasks: updatedSubtasks });
+  };
+
+  const addSubtask = () => {
+    if (!newSubtaskText.trim()) return;
+    const newSubtask = {
+      id: Date.now().toString(),
+      text: newSubtaskText,
+      completed: false
+    };
+    onSave({ ...task, subtasks: [...parsedSubtasks, newSubtask] });
+    setNewSubtaskText('');
+  };
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'details', label: 'Task Details' },
@@ -122,43 +141,38 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
         <div className="flex-1 overflow-y-auto p-4">
           {activeTab === 'details' && (
             <div className="space-y-4">
-              {/* Main Card */}
-              <div className="bg-gray-800 rounded-xl p-4 border border-gray-700/50">
-                {/* Title with badge */}
-                <div className="flex items-start gap-3 mb-3">
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${
-                    task.priority === 'High' ? 'bg-red-600/20 text-red-400' :
-                    task.priority === 'Med' ? 'bg-yellow-600/20 text-yellow-400' :
-                    'bg-gray-600/20 text-gray-400'
-                  }`}>
-                    {task.priority}
-                  </span>
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="flex-1 text-base font-semibold bg-transparent border-none text-white focus:outline-none focus:ring-0 placeholder-gray-500"
-                    placeholder="Task title..."
-                  />
-                </div>
-
-                {/* Description */}
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={2}
-                  className="w-full text-sm bg-transparent border-none text-gray-400 focus:outline-none focus:ring-0 resize-none placeholder-gray-500 mb-4"
-                  placeholder="Add a description..."
+              {/* Title with Priority Badge */}
+              <div className="flex items-start gap-3">
+                <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${
+                  task.priority === 'High' ? 'bg-red-600/20 text-red-400' :
+                  task.priority === 'Med' ? 'bg-yellow-600/20 text-yellow-400' :
+                  'bg-gray-600/20 text-gray-400'
+                }`}>
+                  {task.priority}
+                </span>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="flex-1 text-lg font-semibold bg-transparent border-none text-white focus:outline-none focus:ring-0 placeholder-gray-500"
+                  placeholder="Task title..."
                 />
+              </div>
 
-                {/* Subtasks */}
+              {/* Checklist / Subtasks */}
+              <div className="bg-gray-800/50 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-gray-300">Checklist</h3>
+                  <span className="text-xs text-gray-500">{completedSubtasks}/{totalSubtasks}</span>
+                </div>
+                
                 {totalSubtasks > 0 && (
-                  <div className="space-y-2">
+                  <div className="space-y-2 mb-3">
                     {parsedSubtasks.map((subtask) => (
                       <div key={subtask.id} className="flex items-start gap-3 group">
                         <button 
                           className="text-gray-500 hover:text-purple-400 transition-colors mt-0.5"
-                          onClick={() => {/* toggle subtask */}}
+                          onClick={() => toggleSubtask(subtask.id)}
                         >
                           {subtask.completed ? '✅' : '☐'}
                         </button>
@@ -170,16 +184,39 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                   </div>
                 )}
 
-                {/* Add Subtask */}
-                <button className="mt-4 flex items-center gap-2 text-sm text-gray-500 hover:text-white transition-colors">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add subtask
-                </button>
+                {/* Add Subtask Input */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newSubtaskText}
+                    onChange={(e) => setNewSubtaskText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addSubtask()}
+                    placeholder="Add an item..."
+                    className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                  />
+                  <button
+                    onClick={addSubtask}
+                    disabled={!newSubtaskText.trim()}
+                    className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium disabled:opacity-50"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
 
-              {/* Properties */}
+              {/* Description */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">Description</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-purple-500 resize-none"
+                  placeholder="Add a description..."
+                />
+              </div>
+
+              {/* Properties Grid */}
               <div className="grid grid-cols-2 gap-3">
                 {/* Status */}
                 <div className="bg-gray-800/50 rounded-lg p-3">
@@ -187,7 +224,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as Status)}
-                    className="w-full bg-gray-700/50 text-sm text-white rounded-lg px-3 py-2 border border-gray-600/50 focus:outline-none focus:border-purple-500"
+                    className="w-full bg-gray-800 text-sm text-white rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:border-purple-500"
                   >
                     {COLUMNS.map(col => (
                       <option key={col.id} value={col.id}>{col.title}</option>
@@ -201,7 +238,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                   <select
                     value={project}
                     onChange={(e) => setProject(e.target.value)}
-                    className="w-full bg-gray-700/50 text-sm text-white rounded-lg px-3 py-2 border border-gray-600/50 focus:outline-none focus:border-purple-500"
+                    className="w-full bg-gray-800 text-sm text-white rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:border-purple-500"
                   >
                     <option value="">Select...</option>
                     {PROJECTS.map(p => (
@@ -216,7 +253,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                   <select
                     value={assignee}
                     onChange={(e) => setAssignee(e.target.value)}
-                    className="w-full bg-gray-700/50 text-sm text-white rounded-lg px-3 py-2 border border-gray-600/50 focus:outline-none focus:border-purple-500"
+                    className="w-full bg-gray-800 text-sm text-white rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:border-purple-500"
                   >
                     <option value="">Unassigned</option>
                     {TEAM_MEMBERS.map(m => (
@@ -232,7 +269,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full bg-gray-700/50 text-sm text-white rounded-lg px-3 py-2 border border-gray-600/50 focus:outline-none focus:border-purple-500"
+                    className="w-full bg-gray-800 text-sm text-white rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:border-purple-500"
                   />
                 </div>
               </div>
@@ -272,7 +309,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                     onArchive?.(task.id);
                     onClose();
                   }}
-                  className="px-4 py-2.5 bg-gray-700 text-yellow-400 rounded-lg hover:bg-gray-600 transition-colors"
+                  className="px-4 py-2.5 bg-gray-800 text-yellow-400 rounded-lg hover:bg-gray-700 transition-colors"
                   title="Archive"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +321,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                     onDelete?.(task.id);
                     onClose();
                   }}
-                  className="px-4 py-2.5 bg-gray-700 text-red-400 rounded-lg hover:bg-gray-600 transition-colors"
+                  className="px-4 py-2.5 bg-gray-800 text-red-400 rounded-lg hover:bg-gray-700 transition-colors"
                   title="Delete"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
