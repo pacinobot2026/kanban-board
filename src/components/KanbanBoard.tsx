@@ -28,6 +28,7 @@ export function KanbanBoard() {
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<TaskType | 'all'>('all');
+  const [selectedAssignee, setSelectedAssignee] = useState<string | null>(null);
   const [showProjectSidebar, setShowProjectSidebar] = useState(false);
   const [showActivityFeed, setShowActivityFeed] = useState(false);
   const [showMobileActivity, setShowMobileActivity] = useState(false);
@@ -158,7 +159,8 @@ export function KanbanBoard() {
   const filteredTasks = tasks.filter(t => {
     const projectMatch = selectedProject ? t.project === selectedProject : true;
     const typeMatch = typeFilter === 'all' ? true : t.type === typeFilter;
-    return projectMatch && typeMatch;
+    const assigneeMatch = selectedAssignee ? t.assignee === selectedAssignee : true;
+    return projectMatch && typeMatch && assigneeMatch;
   });
 
   const getTasksByStatus = (status: Status) => {
@@ -235,12 +237,27 @@ export function KanbanBoard() {
               {TEAM_MEMBERS.map((member) => (
                 <button
                   key={member.id}
-                  className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group"
+                  onClick={() => setSelectedAssignee(selectedAssignee === member.name ? null : member.name)}
+                  className={`flex items-center gap-2 transition-colors group ${
+                    selectedAssignee === member.name 
+                      ? 'text-purple-400' 
+                      : 'text-gray-300 hover:text-white'
+                  }`}
                 >
                   <span className="text-sm font-medium">{member.name}</span>
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <div className={`w-2 h-2 rounded-full ${
+                    selectedAssignee === member.name ? 'bg-purple-500' : 'bg-green-500'
+                  }`}></div>
                 </button>
               ))}
+              {selectedAssignee && (
+                <button
+                  onClick={() => setSelectedAssignee(null)}
+                  className="text-xs text-gray-500 hover:text-gray-300"
+                >
+                  Clear
+                </button>
+              )}
             </div>
             
             {/* Right: Add Task */}
