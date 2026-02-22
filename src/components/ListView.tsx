@@ -187,7 +187,14 @@ export function ListView({ tasks, onEditTask, onToggleSubtask, onDeleteTask, onA
         taskTitle={imageUploadTask?.title || ''}
         onUpload={(imageUrl) => {
           if (imageUploadTask && onUpdateTask) {
-            const currentImages = imageUploadTask.images || [];
+            // Find the latest version of the task from props
+            const latestTask = tasks.find(t => t.id === imageUploadTask.id);
+            const currentImages = latestTask?.images || [];
+            
+            console.log('Adding image to task:', imageUploadTask.id);
+            console.log('Current images:', currentImages);
+            console.log('New image URL length:', imageUrl.length);
+            
             onUpdateTask(imageUploadTask.id, {
               images: [...currentImages, imageUrl]
             });
