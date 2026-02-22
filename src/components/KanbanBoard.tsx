@@ -11,7 +11,9 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  closestCenter,
 } from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
 import { Task, Status, COLUMNS, PROJECTS, TaskType, TEAM_MEMBERS } from '@/types/task';
 import { Column } from './Column';
 import { TaskCard } from './TaskCard';
@@ -102,19 +104,43 @@ export function KanbanBoard() {
 
     if (!over) return;
 
-    const activeTask = tasks.find(t => t.id === active.id);
-    if (!activeTask) return;
+    const activeId = active.id as string;
+    const overId = over.id as string;
 
-    // Save the updated status to database
-    try {
-      await fetch('/api/tasks', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: activeTask.id, status: activeTask.status }),
-      });
-    } catch (error) {
-      console.error('Failed to update task:', error);
-      fetchTasks(); // Revert on error
+    // Check if dragging over another task (reordering)
+    const isOverTask = tasks.some(t => t.id === overId);
+    
+    if (isOverTask && activeId !== overId) {
+      const activeTask = tasks.find(t => t.id === activeId);
+      const overTask = tasks.find(t => t.id === overId);
+      
+      if (activeTask && overTask) {
+        // Get tasks in the same column
+        const columnTasks = tasks.filter(t => t.status === activeTask.status);
+        const activeIndex = columnTasks.findIndex(t => t.id === activeId);
+        const overIndex = columnTasks.findIndex(t => t.id === overId);
+        
+        // Reorder within the column
+        const reorderedColumnTasks = arrayMove(columnTasks, activeIndex, overIndex);
+        
+        // Update full tasks array preserving other columns
+        const otherTasks = tasks.filter(t => t.status !== activeTask.status);
+        const newTasks = [...otherTasks, ...reorderedColumnTasks];
+        
+        setTasks(newTasks);
+        
+        // Save to database
+        try {
+          await fetch('/api/tasks', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...activeTask, status: overTask.status }),
+          });
+        } catch (error) {
+          console.error('Failed to reorder task:', error);
+          fetchTasks();
+        }
+      }
     }
   };
 
@@ -346,6 +372,16 @@ export function KanbanBoard() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
+                <div className="w-px h-6 bg-gray-700 mx-1" />
+                <button
+                  onClick={handleNewTask}
+                  className="p-2 rounded transition-colors text-gray-400 hover:text-white hover:bg-gray-700"
+                  title="Add Task"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
               </div>
 
               {/* Bell button (all screens) */}
@@ -389,6 +425,7 @@ export function KanbanBoard() {
           {viewMode === 'board' ? (
             <DndContext
               sensors={sensors}
+              collisionDetection={closestCenter}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDragEnd={handleDragEnd}
