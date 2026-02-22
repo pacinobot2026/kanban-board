@@ -465,6 +465,7 @@ export function KanbanBoard() {
                 onDeleteTask={handleDeleteTask}
                 onArchiveTask={handleArchiveTask}
                 onAddTask={(status) => handleNewTask(status)}
+                onReorderTasks={(newTasks) => setTasks(newTasks)}
               />
             </div>
           )}
