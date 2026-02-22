@@ -18,6 +18,7 @@ import { TaskCard } from './TaskCard';
 import { TaskModal } from './TaskModal';
 import { ProjectSidebar } from './ProjectSidebar';
 import { ActivityFeed } from './ActivityFeed';
+import { NavigationSidebar } from './NavigationSidebar';
 
 export function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -179,6 +180,9 @@ export function KanbanBoard() {
 
   return (
     <div className="flex h-screen bg-gray-950 overflow-hidden">
+      {/* Far Left - Navigation Sidebar */}
+      <NavigationSidebar />
+
       {/* Left Sidebar - Projects (Desktop always visible, Mobile slide-in) */}
       <div className={`
         fixed lg:relative inset-y-0 left-0 z-30 transform transition-transform duration-300
