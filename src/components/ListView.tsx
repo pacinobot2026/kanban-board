@@ -38,6 +38,145 @@ const STATUS_ICONS: Record<Status, string> = {
   'done': '✅',
 };
 
+export function ListView({ tasks, onEditTask, onToggleSubtask, onDeleteTask, onArchiveTask, onAddTask, onReorderTasks }: ListViewProps) {
+  const [expandedSections, setExpandedSections] = useState<Record<Status, boolean>>({
+    'inbox': true,
+    'assigned': true,
+    'in-progress': true,
+    'review': true,
+    'done': false,
+  });
+  
+  const [columnOrder, setColumnOrder] = useState(COLUMNS);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    })
+  );
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const getAssignee = (assigneeId?: string) => {
+    if (!assigneeId) return null;
+    return TEAM_MEMBERS.find(m => m.id === assigneeId);
+  };
+
+  const toggleSection = (status: Status) => {
+    setExpandedSections(prev => ({ ...prev, [status]: !prev[status] }));
+  };
+
+  const getTasksByStatus = (status: Status) => tasks.filter(t => t.status === status);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // Check if dragging a column (section)
+    const isColumn = columnOrder.some(c => c.id === activeId);
+    if (isColumn && activeId !== overId) {
+      const oldIndex = columnOrder.findIndex(c => c.id === activeId);
+      const newIndex = columnOrder.findIndex(c => c.id === overId);
+      setColumnOrder(arrayMove(columnOrder, oldIndex, newIndex));
+      return;
+    }
+
+    // Check if dragging a task
+    const isTask = tasks.some(t => t.id === activeId);
+    if (isTask && activeId !== overId && onReorderTasks) {
+      const activeTask = tasks.find(t => t.id === activeId);
+      const overTask = tasks.find(t => t.id === overId);
+      
+      if (activeTask && overTask && activeTask.status === overTask.status) {
+        // Reorder within same status
+        const columnTasks = tasks.filter(t => t.status === activeTask.status);
+        const oldIndex = columnTasks.findIndex(t => t.id === activeId);
+        const newIndex = columnTasks.findIndex(t => t.id === overId);
+        
+        const reorderedColumnTasks = arrayMove(columnTasks, oldIndex, newIndex);
+        const otherTasks = tasks.filter(t => t.status !== activeTask.status);
+        onReorderTasks([...otherTasks, ...reorderedColumnTasks]);
+      }
+    }
+  };
+
+  if (tasks.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 text-gray-500">
+        No tasks found
+      </div>
+    );
+  }
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={columnOrder.map(c => c.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-4 pb-8">
+          {columnOrder.map((column) => {
+            const sectionTasks = getTasksByStatus(column.id);
+            const isExpanded = expandedSections[column.id];
+            
+            return (
+              <SortableSection
+                key={column.id}
+                column={column}
+                isExpanded={isExpanded}
+                onToggle={() => toggleSection(column.id)}
+                taskCount={sectionTasks.length}
+                onAddTask={() => onAddTask?.(column.id)}
+              >
+                {isExpanded && sectionTasks.length > 0 && (
+                  <div>
+                    {/* Table Header */}
+                    <div className="grid grid-cols-12 gap-4 px-4 py-2 bg-gray-800/50 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-700">
+                      <div className="col-span-2">Assigned</div>
+                      <div className="col-span-3">Description</div>
+                      <div className="col-span-1">Created</div>
+                      <div className="col-span-1">Status</div>
+                      <div className="col-span-2">Due Date</div>
+                      <div className="col-span-1 text-center">Images</div>
+                      <div className="col-span-1 text-center">Comments</div>
+                      <div className="col-span-1">Progress</div>
+                    </div>
+                    
+                    <SortableContext items={sectionTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                      {sectionTasks.map((task) => (
+                        <SortableTask
+                          key={task.id}
+                          task={task}
+                          onEdit={() => onEditTask(task)}
+                          onToggleSubtask={() => onToggleSubtask?.(task.id, task.subtasks?.[0]?.id || '')}
+                          onArchive={() => onArchiveTask?.(task.id)}
+                          formatDate={formatDate}
+                          getAssignee={getAssignee}
+                        />
+                      ))}
+                    </SortableContext>
+                  </div>
+                )}
+                
+                {isExpanded && sectionTasks.length === 0 && (
+                  <div className="px-4 py-3 text-sm text-gray-600 italic bg-gray-900/30">
+                    No tasks
+                  </div>
+                )}
+              </SortableSection>
+            );
+          })}
+        </div>
+      </SortableContext>
+    </DndContext>
+  );
+}
+
 interface SortableSectionProps {
   column: { id: Status; title: string };
   children: React.ReactNode;
@@ -128,228 +267,100 @@ function SortableTask({ task, onEdit, onToggleSubtask, onArchive, formatDate, ge
   const progress = totalSubtasks > 0 
     ? Math.round((completedSubtasks / totalSubtasks) * 100)
     : task.progress || 0;
+  
+  const commentCount = task.comments?.length || 0;
+  const hasImages = task.attachments && task.attachments.length > 0;
 
   return (
     <div 
       ref={setNodeRef}
       style={style}
-      className="px-4 py-3 flex items-center gap-4 hover:bg-gray-800/50 transition-colors group bg-gray-900/30"
+      className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors items-center cursor-pointer group"
+      onClick={onEdit}
     >
       {/* Drag Handle */}
-      <button
-        {...attributes}
-        {...listeners}
-        className="text-gray-600 hover:text-gray-400 cursor-grab active:cursor-grabbing p-1"
-        title="Drag to reorder"
-      >
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-        </svg>
-      </button>
-
-      {/* Checkbox */}
-      {task.subtasks && task.subtasks.length > 0 ? (
+      <div className="absolute left-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
-          onClick={onToggleSubtask}
-          className="text-gray-500 hover:text-purple-400 w-5"
+          {...attributes}
+          {...listeners}
+          className="text-gray-600 hover:text-gray-400 cursor-grab active:cursor-grabbing p-1"
+          onClick={(e) => e.stopPropagation()}
         >
-          {task.subtasks[0].completed ? '✅' : '☐'}
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+          </svg>
         </button>
-      ) : (
-        <div className="w-5" />
-      )}
-
-      {/* Priority Dot */}
-      <div className={`w-2 h-2 rounded-full ${PRIORITY_COLORS[task.priority]}`} />
-
-      {/* Title */}
-      <div className="flex-1 min-w-0">
-        <p 
-          className="text-sm text-gray-200 cursor-pointer hover:text-purple-400 truncate"
-          onClick={onEdit}
-        >
-          {task.title}
-        </p>
       </div>
 
-      {/* Assignee */}
-      <div className="hidden sm:flex items-center gap-2 w-28">
+      {/* Assigned */}
+      <div className="col-span-2 flex items-center gap-2">
         {assignee ? (
           <>
-            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-xs flex-shrink-0">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-xs">
               {assignee.avatar}
             </div>
-            <span className="text-xs text-gray-400 truncate">{assignee.name}</span>
+            <span className="text-sm text-gray-300 truncate">{assignee.name}</span>
           </>
         ) : (
-          <span className="text-xs text-gray-600">—</span>
+          <span className="text-sm text-gray-600">—</span>
         )}
       </div>
 
-      {/* Due Date */}
-      <div className="hidden md:block w-20 text-xs text-gray-500">
+      {/* Description (Title + short desc) */}
+      <div className="col-span-3 min-w-0">
+        <p className="text-sm text-gray-200 truncate font-medium">{task.title}</p>
+        {task.description && (
+          <p className="text-xs text-gray-500 truncate">{task.description}</p>
+        )}
+      </div>
+
+      {/* Date Created */}
+      <div className="col-span-1 text-sm text-gray-500">
+        {formatDate(task.createdAt || new Date().toISOString())}
+      </div>
+
+      {/* Status */}
+      <div className="col-span-1">
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${PRIORITY_COLORS[task.priority]} text-white`}>
+          {task.priority}
+        </span>
+      </div>
+
+      {/* Date Due */}
+      <div className="col-span-2 text-sm text-gray-500">
         {task.dueDate ? formatDate(task.dueDate) : '—'}
       </div>
 
-      {/* Progress */}
-      <div className="hidden lg:flex items-center gap-2 w-24">
-        <div className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
-          <div 
-            className={`h-full rounded-full ${progress === 100 ? 'bg-green-500' : 'bg-purple-500'}`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <span className="text-xs text-gray-500 w-7">{progress}%</span>
+      {/* Images */}
+      <div className="col-span-1 text-center">
+        {hasImages ? (
+          <span className="text-sm">📎</span>
+        ) : (
+          <span className="text-sm text-gray-600">—</span>
+        )}
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          onClick={onEdit}
-          className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-700 rounded"
-          title="Edit"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-        </button>
-        <button
-          onClick={onArchive}
-          className="p-1.5 text-gray-500 hover:text-yellow-400 hover:bg-gray-700 rounded"
-          title="Archive"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-          </svg>
-        </button>
+      {/* Comments */}
+      <div className="col-span-1 text-center">
+        {commentCount > 0 ? (
+          <span className="text-sm text-blue-400">💬 {commentCount}</span>
+        ) : (
+          <span className="text-sm text-gray-600">—</span>
+        )}
+      </div>
+
+      {/* Progress */}
+      <div className="col-span-1">
+        <div className="flex items-center gap-2">
+          <div className="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-purple-500 rounded-full"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-xs text-gray-500 w-8">{progress}%</span>
+        </div>
       </div>
     </div>
-  );
-}
-
-export function ListView({ tasks, onEditTask, onToggleSubtask, onDeleteTask, onArchiveTask, onAddTask, onReorderTasks }: ListViewProps) {
-  const [expandedSections, setExpandedSections] = useState<Record<Status, boolean>>({
-    'inbox': true,
-    'assigned': true,
-    'in-progress': true,
-    'review': true,
-    'done': false,
-  });
-  
-  const [columnOrder, setColumnOrder] = useState(COLUMNS);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-    })
-  );
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const getAssignee = (assigneeId?: string) => {
-    if (!assigneeId) return null;
-    return TEAM_MEMBERS.find(m => m.id === assigneeId);
-  };
-
-  const toggleSection = (status: Status) => {
-    setExpandedSections(prev => ({ ...prev, [status]: !prev[status] }));
-  };
-
-  const getTasksByStatus = (status: Status) => tasks.filter(t => t.status === status);
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-
-    // Check if dragging a column (section)
-    const isColumn = columnOrder.some(c => c.id === activeId);
-    if (isColumn && activeId !== overId) {
-      const oldIndex = columnOrder.findIndex(c => c.id === activeId);
-      const newIndex = columnOrder.findIndex(c => c.id === overId);
-      setColumnOrder(arrayMove(columnOrder, oldIndex, newIndex));
-      return;
-    }
-
-    // Check if dragging a task
-    const isTask = tasks.some(t => t.id === activeId);
-    if (isTask && activeId !== overId && onReorderTasks) {
-      const activeTask = tasks.find(t => t.id === activeId);
-      const overTask = tasks.find(t => t.id === overId);
-      
-      if (activeTask && overTask && activeTask.status === overTask.status) {
-        // Reorder within same status
-        const columnTasks = tasks.filter(t => t.status === activeTask.status);
-        const oldIndex = columnTasks.findIndex(t => t.id === activeId);
-        const newIndex = columnTasks.findIndex(t => t.id === overId);
-        
-        const reorderedColumnTasks = arrayMove(columnTasks, oldIndex, newIndex);
-        const otherTasks = tasks.filter(t => t.status !== activeTask.status);
-        onReorderTasks([...otherTasks, ...reorderedColumnTasks]);
-      }
-    }
-  };
-
-  if (tasks.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
-        No tasks found
-      </div>
-    );
-  }
-
-  return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={columnOrder.map(c => c.id)} strategy={verticalListSortingStrategy}>
-        <div className="space-y-3 pb-8">
-          {columnOrder.map((column) => {
-            const sectionTasks = getTasksByStatus(column.id);
-            const isExpanded = expandedSections[column.id];
-            
-            return (
-              <SortableSection
-                key={column.id}
-                column={column}
-                isExpanded={isExpanded}
-                onToggle={() => toggleSection(column.id)}
-                taskCount={sectionTasks.length}
-                onAddTask={() => onAddTask?.(column.id)}
-              >
-                {isExpanded && sectionTasks.length > 0 && (
-                  <SortableContext items={sectionTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                    <div className="divide-y divide-gray-800/50">
-                      {sectionTasks.map((task) => (
-                        <SortableTask
-                          key={task.id}
-                          task={task}
-                          onEdit={() => onEditTask(task)}
-                          onToggleSubtask={() => onToggleSubtask?.(task.id, task.subtasks?.[0]?.id || '')}
-                          onArchive={() => onArchiveTask?.(task.id)}
-                          formatDate={formatDate}
-                          getAssignee={getAssignee}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                )}
-                
-                {isExpanded && sectionTasks.length === 0 && (
-                  <div className="px-4 py-3 text-sm text-gray-600 italic bg-gray-900/30">
-                    No tasks
-                  </div>
-                )}
-              </SortableSection>
-            );
-          })}
-        </div>
-      </SortableContext>
-    </DndContext>
   );
 }
