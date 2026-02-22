@@ -42,9 +42,37 @@ export function ImageUploadModal({ isOpen, onClose, onUpload, taskTitle }: Image
       return;
     }
 
+    // Compress image before saving
     const reader = new FileReader();
     reader.onload = (e) => {
-      setPreviewUrl(e.target?.result as string);
+      const img = new Image();
+      img.onload = () => {
+        // Create canvas to compress
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Max width/height of 800px
+        let width = img.width;
+        let height = img.height;
+        const maxSize = 800;
+        
+        if (width > height && width > maxSize) {
+          height = (height * maxSize) / width;
+          width = maxSize;
+        } else if (height > maxSize) {
+          width = (width * maxSize) / height;
+          height = maxSize;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Compress to JPEG at 70% quality
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        setPreviewUrl(compressedDataUrl);
+      };
+      img.src = e.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
