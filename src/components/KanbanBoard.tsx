@@ -269,25 +269,14 @@ export function KanbanBoard() {
       {/* Far Left - Navigation Sidebar */}
       <NavigationSidebar />
 
-      {/* Left Sidebar - Projects (Desktop always visible, Mobile slide-in) */}
-      <div className={`
-        fixed lg:relative inset-y-0 left-0 z-30 transform transition-transform duration-300
-        ${showProjectSidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-        <ProjectSidebar
-          projects={projectCounts}
-          selectedProject={selectedProject}
-          onSelectProject={handleSelectProject}
-        />
-      </div>
-
-      {/* Overlay for mobile */}
-      {showProjectSidebar && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
-          onClick={() => setShowProjectSidebar(false)}
-        />
-      )}
+      {/* Project Sidebar Slide-out (Right side) */}
+      <ProjectSidebar
+        projects={projectCounts}
+        selectedProject={selectedProject}
+        onSelectProject={handleSelectProject}
+        isOpen={showProjectSidebar}
+        onClose={() => setShowProjectSidebar(false)}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -385,6 +374,17 @@ export function KanbanBoard() {
                   </svg>
                 </button>
               </div>
+
+              {/* Projects button */}
+              <button
+                onClick={() => setShowProjectSidebar(true)}
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                title="Projects"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+              </button>
 
               {/* Bell button (all screens) */}
               <button
