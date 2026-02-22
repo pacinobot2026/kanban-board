@@ -18,6 +18,7 @@ import { Task, Status, COLUMNS, PROJECTS, TaskType, TEAM_MEMBERS } from '@/types
 import { Column } from './Column';
 import { TaskCard } from './TaskCard';
 import { TaskModal } from './TaskModal';
+import { TaskDetail } from './TaskDetail';
 import { ProjectSidebar } from './ProjectSidebar';
 import { ActivityFeed } from './ActivityFeed';
 import { NavigationSidebar } from './NavigationSidebar';
@@ -36,6 +37,8 @@ export function KanbanBoard() {
   const [showActivityFeed, setShowActivityFeed] = useState(false);
   const [showMobileActivity, setShowMobileActivity] = useState(false);
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
+  const [showTaskDetail, setShowTaskDetail] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [initialStatus, setInitialStatus] = useState<Status | null>(null);
   const router = useRouter();
 
@@ -171,8 +174,8 @@ export function KanbanBoard() {
   };
 
   const handleEditTask = (task: Task) => {
-    setEditingTask(task);
-    setIsModalOpen(true);
+    setSelectedTask(task);
+    setShowTaskDetail(true);
   };
 
   const handleNewTask = (status?: Status) => {
@@ -269,14 +272,14 @@ export function KanbanBoard() {
       {/* Far Left - Navigation Sidebar */}
       <NavigationSidebar />
 
-      {/* Project Sidebar Slide-out (Right side) */}
-      <ProjectSidebar
-        projects={projectCounts}
-        selectedProject={selectedProject}
-        onSelectProject={handleSelectProject}
-        isOpen={showProjectSidebar}
-        onClose={() => setShowProjectSidebar(false)}
-      />
+      {/* Left Sidebar - Projects */}
+      <div className="hidden lg:block">
+        <ProjectSidebar
+          projects={projectCounts}
+          selectedProject={selectedProject}
+          onSelectProject={handleSelectProject}
+        />
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -374,17 +377,6 @@ export function KanbanBoard() {
                   </svg>
                 </button>
               </div>
-
-              {/* Projects button */}
-              <button
-                onClick={() => setShowProjectSidebar(true)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
-                title="Projects"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-              </button>
 
               {/* Bell button (all screens) */}
               <button
@@ -507,6 +499,15 @@ export function KanbanBoard() {
           setInitialStatus(null);
         }}
         onSave={handleSaveTask}
+      />
+
+      <TaskDetail
+        task={selectedTask}
+        isOpen={showTaskDetail}
+        onClose={() => setShowTaskDetail(false)}
+        onSave={handleSaveTask}
+        onDelete={handleDeleteTask}
+        onArchive={handleArchiveTask}
       />
     </div>
   );
