@@ -19,6 +19,7 @@ import { TaskModal } from './TaskModal';
 import { ProjectSidebar } from './ProjectSidebar';
 import { ActivityFeed } from './ActivityFeed';
 import { NavigationSidebar } from './NavigationSidebar';
+import { ListView } from './ListView';
 
 export function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -32,6 +33,7 @@ export function KanbanBoard() {
   const [showProjectSidebar, setShowProjectSidebar] = useState(false);
   const [showActivityFeed, setShowActivityFeed] = useState(false);
   const [showMobileActivity, setShowMobileActivity] = useState(false);
+  const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -314,12 +316,42 @@ export function KanbanBoard() {
               )}
             </div>
             
-            {/* Right: Add Task */}
+            {/* Right: View Toggle, Bell, Add Task */}
             <div className="flex items-center gap-2">
-              {/* Bell button (mobile only) */}
+              {/* View Toggle */}
+              <div className="hidden md:flex items-center bg-gray-800 rounded-lg p-1 mr-2">
+                <button
+                  onClick={() => setViewMode('board')}
+                  className={`p-2 rounded transition-colors ${
+                    viewMode === 'board' 
+                      ? 'bg-purple-600 text-white' 
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                  title="Board View"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded transition-colors ${
+                    viewMode === 'list' 
+                      ? 'bg-purple-600 text-white' 
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                  title="List View"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Bell button (all screens) */}
               <button
                 onClick={() => setShowMobileActivity(true)}
-                className="xl:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors relative"
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors relative"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -352,37 +384,49 @@ export function KanbanBoard() {
           </div>
         </div>
 
-        {/* Kanban Board */}
+        {/* Board or List View */}
         <div className="flex-1 overflow-hidden">
-          <DndContext
-            sensors={sensors}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="h-full overflow-x-auto overflow-y-hidden">
-              <div className="flex gap-3 lg:gap-4 p-4 lg:p-6 min-w-max h-full">
-                {COLUMNS.map(column => (
-                  <Column
-                    key={column.id}
-                    id={column.id}
-                    title={column.title}
-                    tasks={getTasksByStatus(column.id)}
-                    onEditTask={handleEditTask}
-                    onToggleSubtask={handleToggleSubtask}
-                    onDeleteTask={handleDeleteTask}
-                    onArchiveTask={handleArchiveTask}
-                  />
-                ))}
+          {viewMode === 'board' ? (
+            <DndContext
+              sensors={sensors}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="h-full overflow-x-auto overflow-y-hidden">
+                <div className="flex gap-3 lg:gap-4 p-4 lg:p-6 min-w-max h-full">
+                  {COLUMNS.map(column => (
+                    <Column
+                      key={column.id}
+                      id={column.id}
+                      title={column.title}
+                      tasks={getTasksByStatus(column.id)}
+                      onEditTask={handleEditTask}
+                      onToggleSubtask={handleToggleSubtask}
+                      onDeleteTask={handleDeleteTask}
+                      onArchiveTask={handleArchiveTask}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <DragOverlay>
-              {activeTask && (
-                <TaskCard task={activeTask} onEdit={() => {}} onToggleSubtask={handleToggleSubtask} />
-              )}
-            </DragOverlay>
-          </DndContext>
+              <DragOverlay>
+                {activeTask && (
+                  <TaskCard task={activeTask} onEdit={() => {}} onToggleSubtask={handleToggleSubtask} />
+                )}
+              </DragOverlay>
+            </DndContext>
+          ) : (
+            <div className="h-full overflow-auto p-4 lg:p-6">
+              <ListView 
+                tasks={filteredTasks}
+                onEditTask={handleEditTask}
+                onToggleSubtask={handleToggleSubtask}
+                onDeleteTask={handleDeleteTask}
+                onArchiveTask={handleArchiveTask}
+              />
+            </div>
+          )}
         </div>
       </div>
 
