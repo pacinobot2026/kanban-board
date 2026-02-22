@@ -472,19 +472,14 @@ export function KanbanBoard() {
         </div>
       </div>
 
-      {/* Right Sidebar - Activity (Desktop always visible) */}
-      <div className="hidden xl:block">
-        <ActivityFeed tasks={tasks} />
-      </div>
-
-      {/* Mobile Activity Feed Overlay */}
+      {/* Activity Feed Slide-out Panel (Desktop & Mobile) */}
       {showMobileActivity && (
         <>
           <div 
-            className="fixed inset-0 bg-black/50 z-40 xl:hidden"
+            className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setShowMobileActivity(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-80 z-50 xl:hidden transform transition-transform">
+          <div className="fixed inset-y-0 right-0 w-80 z-50 transform transition-transform">
             <div className="h-full bg-gray-900 border-l border-gray-800 flex flex-col">
               <div className="p-4 border-b border-gray-800 flex items-center justify-between">
                 <h2 className="text-white font-bold text-lg">🔔 Activity</h2>
