@@ -151,6 +151,28 @@ export function KanbanBoard() {
     setIsModalOpen(true);
   };
 
+  const handleToggleSubtask = async (taskId: string, subtaskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task || !task.subtasks) return;
+
+    const updatedSubtasks = task.subtasks.map(st =>
+      st.id === subtaskId ? { ...st, completed: !st.completed } : st
+    );
+
+    const updatedTask = { ...task, subtasks: updatedSubtasks };
+
+    try {
+      await fetch('/api/tasks', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTask),
+      });
+      fetchTasks();
+    } catch (error) {
+      console.error('Failed to toggle subtask:', error);
+    }
+  };
+
   const handleSelectProject = (projectId: string | null) => {
     setSelectedProject(projectId);
     setShowProjectSidebar(false); // Close on mobile after selection
@@ -315,6 +337,7 @@ export function KanbanBoard() {
                     title={column.title}
                     tasks={getTasksByStatus(column.id)}
                     onEditTask={handleEditTask}
+                    onToggleSubtask={handleToggleSubtask}
                   />
                 ))}
               </div>
@@ -322,7 +345,7 @@ export function KanbanBoard() {
 
             <DragOverlay>
               {activeTask && (
-                <TaskCard task={activeTask} onEdit={() => {}} />
+                <TaskCard task={activeTask} onEdit={() => {}} onToggleSubtask={handleToggleSubtask} />
               )}
             </DragOverlay>
           </DndContext>

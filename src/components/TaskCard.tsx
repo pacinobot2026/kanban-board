@@ -7,6 +7,7 @@ import { Task, STATUS_LABEL_COLORS, TEAM_MEMBERS } from '@/types/task';
 interface TaskCardProps {
   task: Task;
   onEdit: (task: Task) => void;
+  onToggleSubtask?: (taskId: string, subtaskId: string) => void;
 }
 
 const PRIORITY_COLORS = {
@@ -15,7 +16,7 @@ const PRIORITY_COLORS = {
   'High': 'bg-red-600 text-red-100',
 };
 
-export function TaskCard({ task, onEdit }: TaskCardProps) {
+export function TaskCard({ task, onEdit, onToggleSubtask }: TaskCardProps) {
   const {
     attributes,
     listeners,
@@ -65,11 +66,10 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
               {task.statusLabel}
             </span>
           )}
-          {task.priority === 'High' && (
-            <span className="text-xs px-2 py-1 rounded-md font-medium bg-red-600 text-red-100">
-              HIGH
-            </span>
-          )}
+          {/* Priority Badge */}
+          <span className={`text-xs px-2 py-1 rounded-md font-medium ${PRIORITY_COLORS[task.priority]}`}>
+            {task.priority}
+          </span>
         </div>
         {task.daysSince && (
           <span className="text-xs text-gray-500 shrink-0">
@@ -90,11 +90,18 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
         </p>
       )}
 
-      {/* Subtasks */}
+      {/* Subtasks with clickable checkboxes */}
       {task.subtasks && task.subtasks.length > 0 && (
         <div className="mb-3 space-y-1.5">
           {task.subtasks.slice(0, 3).map((subtask) => (
-            <div key={subtask.id} className="flex items-start gap-2 text-xs">
+            <div 
+              key={subtask.id} 
+              className="flex items-start gap-2 text-xs cursor-pointer hover:bg-gray-700/50 rounded px-1 py-0.5 -mx-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSubtask?.(task.id, subtask.id);
+              }}
+            >
               <span className={subtask.completed ? 'text-green-400' : 'text-gray-600'}>
                 {subtask.completed ? '✅' : '☐'}
               </span>
@@ -158,12 +165,21 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
         )}
         {!assignee && <div />}
 
-        {/* Due Date */}
-        {task.dueDate && (
-          <span className="text-xs text-gray-500">
-            Due {formatDate(task.dueDate)}
-          </span>
-        )}
+        {/* Dates */}
+        <div className="flex items-center gap-3">
+          {/* Date Created */}
+          {task.createdAt && (
+            <span className="text-xs text-gray-500" title="Created">
+              📝 {formatDate(task.createdAt)}
+            </span>
+          )}
+          {/* Due Date */}
+          {task.dueDate && (
+            <span className="text-xs text-gray-500" title="Due">
+              📅 {formatDate(task.dueDate)}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
