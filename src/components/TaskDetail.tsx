@@ -128,14 +128,14 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
           </div>
           
           {/* Progress Bar */}
-          <div className="mb-3">
-            <div className="flex items-center justify-between mb-1">
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-gray-500">Progress</span>
               <span className="text-xs text-gray-400 font-medium">{progress}%</span>
             </div>
-            <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-purple-600 rounded-full transition-all"
+                className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
