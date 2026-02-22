@@ -55,8 +55,24 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
   };
 
   const assigneeInfo = assignee ? TEAM_MEMBERS.find(m => m.id === assignee) : null;
-  const completedSubtasks = task.subtasks?.filter(s => s.completed).length || 0;
-  const totalSubtasks = task.subtasks?.length || 0;
+  
+  // Handle subtasks that might be stored as JSON string
+  const parsedSubtasks = (() => {
+    if (!task.subtasks) return [];
+    if (Array.isArray(task.subtasks)) return task.subtasks;
+    if (typeof task.subtasks === 'string') {
+      try {
+        const parsed = JSON.parse(task.subtasks);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  })();
+  
+  const completedSubtasks = parsedSubtasks.filter(s => s.completed).length;
+  const totalSubtasks = parsedSubtasks.length;
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'details', label: 'Task Details' },
@@ -136,9 +152,9 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                 />
 
                 {/* Subtasks */}
-                {task.subtasks && task.subtasks.length > 0 && (
+                {totalSubtasks > 0 && (
                   <div className="space-y-2">
-                    {task.subtasks.map((subtask) => (
+                    {parsedSubtasks.map((subtask) => (
                       <div key={subtask.id} className="flex items-start gap-3 group">
                         <button 
                           className="text-gray-500 hover:text-purple-400 transition-colors mt-0.5"
