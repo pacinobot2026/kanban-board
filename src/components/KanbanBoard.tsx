@@ -275,10 +275,10 @@ export function KanbanBoard() {
         <NavigationSidebar />
       </div>
       
-      {/* Hamburger Menu - Top Left on mobile, Top Right on desktop */}
+      {/* Hamburger Menu - Top Left on mobile only */}
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="hamburger-menu fixed top-4 left-4 md:left-auto md:right-4 z-[1001] bg-gray-800 border border-gray-700 rounded-lg p-3 text-white cursor-pointer shadow-lg"
+        className="hamburger-menu md:hidden fixed top-4 left-4 z-[1001] bg-gray-800 border border-gray-700 rounded-lg p-3 text-white cursor-pointer shadow-lg"
       >
         <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -292,7 +292,7 @@ export function KanbanBoard() {
             onClick={() => setMobileMenuOpen(false)}
             className="fixed inset-0 bg-black/50 z-[999]"
           />
-          <div className="fixed top-[72px] left-4 md:left-auto md:right-4 bg-gray-800 border border-gray-700 rounded-xl p-2 z-[1000] min-w-[200px] shadow-xl">
+          <div className="fixed top-[72px] left-4 bg-gray-800 border border-gray-700 rounded-xl p-2 z-[1000] min-w-[200px] shadow-xl">
             <div className="px-3 py-2 text-gray-400 text-xs font-semibold uppercase">
               Publications
             </div>
