@@ -5,12 +5,13 @@ import { Task, Priority, Status, StatusLabel, Subtask, COLUMNS, PROJECTS, TEAM_M
 
 interface TaskModalProps {
   task: Task | null;
+  initialStatus?: Status | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (task: Partial<Task>) => void;
 }
 
-export function TaskModal({ task, isOpen, onClose, onSave }: TaskModalProps) {
+export function TaskModal({ task, initialStatus, isOpen, onClose, onSave }: TaskModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('Med');
@@ -41,7 +42,7 @@ export function TaskModal({ task, isOpen, onClose, onSave }: TaskModalProps) {
       setTitle('');
       setDescription('');
       setPriority('Med');
-      setStatus('inbox');
+      setStatus(initialStatus || 'inbox');
       setProject('');
       setAssignee('');
       setProgress(0);

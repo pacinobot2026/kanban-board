@@ -36,6 +36,7 @@ export function KanbanBoard() {
   const [showActivityFeed, setShowActivityFeed] = useState(false);
   const [showMobileActivity, setShowMobileActivity] = useState(false);
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
+  const [initialStatus, setInitialStatus] = useState<Status | null>(null);
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -174,8 +175,9 @@ export function KanbanBoard() {
     setIsModalOpen(true);
   };
 
-  const handleNewTask = () => {
+  const handleNewTask = (status?: Status) => {
     setEditingTask(null);
+    setInitialStatus(status || null);
     setIsModalOpen(true);
   };
 
@@ -442,10 +444,7 @@ export function KanbanBoard() {
                       onToggleSubtask={handleToggleSubtask}
                       onDeleteTask={handleDeleteTask}
                       onArchiveTask={handleArchiveTask}
-                      onAddTask={(status) => {
-                        setEditingTask({ status } as Task);
-                        setIsModalOpen(true);
-                      }}
+                      onAddTask={(status) => handleNewTask(status)}
                     />
                   ))}
                 </div>
@@ -465,10 +464,7 @@ export function KanbanBoard() {
                 onToggleSubtask={handleToggleSubtask}
                 onDeleteTask={handleDeleteTask}
                 onArchiveTask={handleArchiveTask}
-                onAddTask={(status) => {
-                  setEditingTask({ status } as Task);
-                  setIsModalOpen(true);
-                }}
+                onAddTask={(status) => handleNewTask(status)}
               />
             </div>
           )}
@@ -508,8 +504,12 @@ export function KanbanBoard() {
 
       <TaskModal
         task={editingTask}
+        initialStatus={initialStatus}
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setInitialStatus(null);
+        }}
         onSave={handleSaveTask}
       />
     </div>
