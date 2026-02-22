@@ -458,8 +458,20 @@ export function KanbanBoard() {
                 onArchiveTask={handleArchiveTask}
                 onAddTask={(status) => handleNewTask(status)}
                 onReorderTasks={(newTasks) => setTasks(newTasks)}
-                onUpdateTask={(taskId, updates) => {
-                  setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
+                onUpdateTask={async (taskId, updates) => {
+                  const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, ...updates } : t);
+                  setTasks(updatedTasks);
+                  
+                  // Save to API
+                  try {
+                    await fetch('/api/tasks', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ action: 'updateAll', tasks: updatedTasks }),
+                    });
+                  } catch (error) {
+                    console.error('Failed to save tasks:', error);
+                  }
                 }}
               />
             </div>
