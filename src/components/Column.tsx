@@ -13,29 +13,30 @@ interface ColumnProps {
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onDeleteTask?: (taskId: string) => void;
   onArchiveTask?: (taskId: string) => void;
+  onAddTask?: (status: Status) => void;
 }
 
-const COLUMN_STYLES: Record<Status, { border: string; badge: string; icon: string }> = {
-  'inbox': { border: 'border-gray-700', badge: 'bg-gray-700', icon: '📥' },
-  'assigned': { border: 'border-blue-600/30', badge: 'bg-blue-600/20 text-blue-400', icon: '👤' },
-  'in-progress': { border: 'border-purple-600/30', badge: 'bg-purple-600/20 text-purple-400', icon: '🚧' },
-  'review': { border: 'border-teal-600/30', badge: 'bg-teal-600/20 text-teal-400', icon: '👁️' },
-  'done': { border: 'border-green-600/30', badge: 'bg-green-600/20 text-green-400', icon: '✅' },
+const COLUMN_STYLES: Record<Status, { bg: string; border: string; badge: string; icon: string }> = {
+  'inbox': { bg: 'bg-gray-800/80', border: 'border-gray-700', badge: 'bg-gray-600 text-gray-200', icon: '📥' },
+  'assigned': { bg: 'bg-blue-900/20', border: 'border-blue-500/30', badge: 'bg-blue-600 text-blue-100', icon: '👤' },
+  'in-progress': { bg: 'bg-purple-900/20', border: 'border-purple-500/30', badge: 'bg-purple-600 text-purple-100', icon: '🚧' },
+  'review': { bg: 'bg-teal-900/20', border: 'border-teal-500/30', badge: 'bg-teal-600 text-teal-100', icon: '👁️' },
+  'done': { bg: 'bg-green-900/20', border: 'border-green-500/30', badge: 'bg-green-600 text-green-100', icon: '✅' },
 };
 
-export function Column({ id, title, tasks, onEditTask, onToggleSubtask, onDeleteTask, onArchiveTask }: ColumnProps) {
+export function Column({ id, title, tasks, onEditTask, onToggleSubtask, onDeleteTask, onArchiveTask, onAddTask }: ColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
   const style = COLUMN_STYLES[id];
 
   return (
     <div
       ref={setNodeRef}
-      className={`flex-shrink-0 w-72 sm:w-80 lg:w-[340px] bg-gray-900/50 backdrop-blur-sm rounded-xl border-2 ${style.border} ${
+      className={`flex-shrink-0 w-72 sm:w-80 lg:w-[340px] ${style.bg} backdrop-blur-sm rounded-xl border-2 ${style.border} ${
         isOver ? 'ring-2 ring-purple-500 ring-opacity-50 shadow-lg shadow-purple-500/20' : ''
       } transition-all flex flex-col`}
     >
-      <div className="p-3 lg:p-4 border-b border-gray-800/50 flex-shrink-0">
-        <div className="flex items-center justify-between">
+      <div className="p-3 lg:p-4 border-b border-gray-700/50 flex-shrink-0">
+        <div className="flex items-center justify-between mb-2">
           <h2 className="font-semibold text-gray-100 flex items-center gap-2 text-sm lg:text-base">
             <span className="text-base lg:text-lg">{style.icon}</span>
             {title}
@@ -44,6 +45,15 @@ export function Column({ id, title, tasks, onEditTask, onToggleSubtask, onDelete
             {tasks.length}
           </span>
         </div>
+        <button
+          onClick={() => onAddTask?.(id)}
+          className="w-full py-2 flex items-center justify-center gap-2 text-sm text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors border border-dashed border-gray-600 hover:border-gray-400"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add Task
+        </button>
       </div>
       
       <div className="p-2 lg:p-3 space-y-2 lg:space-y-3 overflow-y-auto flex-1 custom-scrollbar">

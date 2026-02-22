@@ -405,6 +405,10 @@ export function KanbanBoard() {
                       onToggleSubtask={handleToggleSubtask}
                       onDeleteTask={handleDeleteTask}
                       onArchiveTask={handleArchiveTask}
+                      onAddTask={(status) => {
+                        setEditingTask({ status } as Task);
+                        setIsModalOpen(true);
+                      }}
                     />
                   ))}
                 </div>
