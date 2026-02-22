@@ -36,24 +36,26 @@ export function Column({ id, title, tasks, onEditTask, onToggleSubtask, onDelete
       } transition-all flex flex-col`}
     >
       <div className="p-3 lg:p-4 border-b border-gray-700/50 flex-shrink-0">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between">
           <h2 className="font-semibold text-gray-100 flex items-center gap-2 text-sm lg:text-base">
             <span className="text-base lg:text-lg">{style.icon}</span>
             {title}
           </h2>
-          <span className={`text-xs font-medium px-2 lg:px-2.5 py-1 rounded-full ${style.badge}`}>
-            {tasks.length}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className={`text-xs font-medium px-2 lg:px-2.5 py-1 rounded-full ${style.badge}`}>
+              {tasks.length}
+            </span>
+            <button
+              onClick={() => onAddTask?.(id)}
+              className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              title="Add Task"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => onAddTask?.(id)}
-          className="w-full py-2 flex items-center justify-center gap-2 text-sm text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors border border-dashed border-gray-600 hover:border-gray-400"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add Task
-        </button>
       </div>
       
       <div className="p-2 lg:p-3 space-y-2 lg:space-y-3 overflow-y-auto flex-1 custom-scrollbar">
