@@ -5,6 +5,7 @@ import { DndContext, closestCenter, DragEndEvent, useSensors, useSensor, Pointer
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Task, Status, COLUMNS, TEAM_MEMBERS } from '@/types/task';
+import { ImageUploadModal } from './ImageUploadModal';
 
 interface ListViewProps {
   tasks: Task[];
@@ -14,6 +15,7 @@ interface ListViewProps {
   onArchiveTask?: (taskId: string) => void;
   onAddTask?: (status: Status) => void;
   onReorderTasks?: (tasks: Task[]) => void;
+  onUpdateTask?: (taskId: string, updates: Partial<Task>) => void;
 }
 
 const PRIORITY_COLORS = {
@@ -38,7 +40,7 @@ const STATUS_ICONS: Record<Status, string> = {
   'done': '✅',
 };
 
-export function ListView({ tasks, onEditTask, onToggleSubtask, onDeleteTask, onArchiveTask, onAddTask, onReorderTasks }: ListViewProps) {
+export function ListView({ tasks, onEditTask, onToggleSubtask, onDeleteTask, onArchiveTask, onAddTask, onReorderTasks, onUpdateTask }: ListViewProps) {
   const [expandedSections, setExpandedSections] = useState<Record<Status, boolean>>({
     'inbox': true,
     'assigned': true,
@@ -48,6 +50,9 @@ export function ListView({ tasks, onEditTask, onToggleSubtask, onDeleteTask, onA
   });
   
   const [columnOrder, setColumnOrder] = useState(COLUMNS);
+  
+  // Image upload modal state
+  const [imageUploadTask, setImageUploadTask] = useState<Task | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -155,6 +160,7 @@ export function ListView({ tasks, onEditTask, onToggleSubtask, onDeleteTask, onA
                           onEdit={() => onEditTask(task)}
                           onToggleSubtask={() => onToggleSubtask?.(task.id, task.subtasks?.[0]?.id || '')}
                           onArchive={() => onArchiveTask?.(task.id)}
+                          onAddImage={() => setImageUploadTask(task)}
                           formatDate={formatDate}
                           getAssignee={getAssignee}
                         />
@@ -173,6 +179,22 @@ export function ListView({ tasks, onEditTask, onToggleSubtask, onDeleteTask, onA
           })}
         </div>
       </SortableContext>
+      
+      {/* Image Upload Modal */}
+      <ImageUploadModal
+        isOpen={!!imageUploadTask}
+        onClose={() => setImageUploadTask(null)}
+        taskTitle={imageUploadTask?.title || ''}
+        onUpload={(imageUrl) => {
+          if (imageUploadTask && onUpdateTask) {
+            const currentImages = imageUploadTask.images || [];
+            onUpdateTask(imageUploadTask.id, {
+              images: [...currentImages, imageUrl]
+            });
+          }
+          setImageUploadTask(null);
+        }}
+      />
     </DndContext>
   );
 }
@@ -248,11 +270,12 @@ interface SortableTaskProps {
   onEdit: () => void;
   onToggleSubtask?: () => void;
   onArchive?: () => void;
+  onAddImage?: () => void;
   formatDate: (date: string) => string;
   getAssignee: (id?: string) => typeof TEAM_MEMBERS[0] | null | undefined;
 }
 
-function SortableTask({ task, onEdit, onToggleSubtask, onArchive, formatDate, getAssignee }: SortableTaskProps) {
+function SortableTask({ task, onEdit, onToggleSubtask, onArchive, onAddImage, formatDate, getAssignee }: SortableTaskProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
 
   const style = {
@@ -269,7 +292,8 @@ function SortableTask({ task, onEdit, onToggleSubtask, onArchive, formatDate, ge
     : task.progress || 0;
   
   const commentCount = 0; // Comments not in Task type yet
-  const hasImages = false; // Attachments not in Task type yet
+  const imageCount = task.images?.length || 0;
+  const hasImages = imageCount > 0;
 
   return (
     <div 
@@ -332,12 +356,25 @@ function SortableTask({ task, onEdit, onToggleSubtask, onArchive, formatDate, ge
       </div>
 
       {/* Images */}
-      <div className="col-span-1 text-center">
-        {hasImages ? (
-          <span className="text-sm">📎</span>
-        ) : (
-          <span className="text-sm text-gray-600">—</span>
-        )}
+      <div className="col-span-1 text-center flex items-center justify-center gap-1">
+        {hasImages && task.images?.slice(0, 2).map((img, idx) => (
+          <img 
+            key={idx}
+            src={img} 
+            alt="" 
+            className="w-6 h-6 rounded object-cover border border-gray-700"
+          />
+        ))}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddImage?.();
+          }}
+          className="w-6 h-6 rounded bg-gray-700 hover:bg-purple-600 text-gray-400 hover:text-white flex items-center justify-center text-xs transition-colors"
+          title="Add image"
+        >
+          +
+        </button>
       </div>
 
       {/* Comments */}
