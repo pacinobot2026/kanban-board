@@ -173,6 +173,19 @@ export function KanbanBoard() {
     }
   };
 
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    
+    try {
+      await fetch(`/api/tasks?id=${taskId}`, {
+        method: 'DELETE',
+      });
+      fetchTasks();
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
+  };
+
   const handleSelectProject = (projectId: string | null) => {
     setSelectedProject(projectId);
     setShowProjectSidebar(false); // Close on mobile after selection
@@ -338,6 +351,7 @@ export function KanbanBoard() {
                     tasks={getTasksByStatus(column.id)}
                     onEditTask={handleEditTask}
                     onToggleSubtask={handleToggleSubtask}
+                    onDeleteTask={handleDeleteTask}
                   />
                 ))}
               </div>
