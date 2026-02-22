@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Task, Priority, Status, COLUMNS, PROJECTS, TEAM_MEMBERS } from '@/types/task';
 
-type Tab = 'details' | 'checklist' | 'files' | 'comments';
+type Tab = 'details' | 'checklist' | 'images' | 'comments';
 
 interface TaskDetailProps {
   task: Task | null;
@@ -93,7 +93,7 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'details', label: 'Task Details' },
     { id: 'checklist', label: 'Checklist' },
-    { id: 'files', label: 'Files' },
+    { id: 'images', label: 'Images' },
     { id: 'comments', label: 'Comments' },
   ];
 
@@ -287,17 +287,38 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
             </div>
           )}
 
-          {activeTab === 'files' && (
-            <div className="p-8 text-center">
-              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                </svg>
-              </div>
-              <p className="text-gray-400 mb-4">No files attached</p>
-              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm">
-                Upload File
-              </button>
+          {activeTab === 'images' && (
+            <div className="space-y-4">
+              {task.images && task.images.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {task.images.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square bg-gray-800 rounded-lg overflow-hidden group">
+                      <img 
+                        src={img} 
+                        alt={`Image ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button 
+                          onClick={() => window.open(img, '_blank')}
+                          className="px-3 py-1.5 bg-white text-gray-900 rounded text-sm font-medium"
+                        >
+                          View Full
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-400">No images attached</p>
+                </div>
+              )}
             </div>
           )}
 
