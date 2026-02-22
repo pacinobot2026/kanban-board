@@ -308,6 +308,18 @@ export function KanbanBoard() {
               <span className="text-xl">💡</span>
               <span className="text-sm">Idea Board</span>
             </a>
+            <a href="https://vizard-clips-app.vercel.app/bookmarks" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
+              <span className="text-xl">📑</span>
+              <span className="text-sm">Bookmarks</span>
+            </a>
+            <a href="https://vizard-clips-app.vercel.app/shopping" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
+              <span className="text-xl">🛒</span>
+              <span className="text-sm">Shopping/Watch</span>
+            </a>
+            <a href="https://vizard-clips-app.vercel.app/projects" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
+              <span className="text-xl">📂</span>
+              <span className="text-sm">Projects</span>
+            </a>
             <div className="h-px bg-gray-700 my-2" />
             <a href="https://dashboard-gilt-one-zc4y5uu95v.vercel.app" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-3 text-white no-underline rounded-lg hover:bg-gray-700 transition-colors">
               <span className="text-xl">🎛️</span>
