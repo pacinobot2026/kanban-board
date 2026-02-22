@@ -1,15 +1,20 @@
 'use client';
 
-import { PROJECTS } from '@/types/task';
-
-interface ProjectSidebarProps {
-  selectedProject: string | null;
-  onSelectProject: (projectId: string | null) => void;
-  taskCounts: Record<string, number>;
+interface Project {
+  id: string;
+  name: string;
+  icon: string;
+  count: number;
 }
 
-export function ProjectSidebar({ selectedProject, onSelectProject, taskCounts }: ProjectSidebarProps) {
-  const totalCount = Object.values(taskCounts).reduce((sum, count) => sum + count, 0);
+interface ProjectSidebarProps {
+  projects: Project[];
+  selectedProject: string | null;
+  onSelectProject: (projectId: string | null) => void;
+}
+
+export function ProjectSidebar({ projects, selectedProject, onSelectProject }: ProjectSidebarProps) {
+  const totalCount = projects.reduce((sum, p) => sum + p.count, 0);
 
   return (
     <div className="w-60 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
@@ -41,7 +46,7 @@ export function ProjectSidebar({ selectedProject, onSelectProject, taskCounts }:
         <div className="h-px bg-gray-800 my-2" />
 
         {/* Individual Projects */}
-        {PROJECTS.map(project => (
+        {projects.map(project => (
           <button
             key={project.id}
             onClick={() => onSelectProject(project.id)}
@@ -56,7 +61,7 @@ export function ProjectSidebar({ selectedProject, onSelectProject, taskCounts }:
               <span className="truncate">{project.name}</span>
             </span>
             <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full">
-              {taskCounts[project.id] || 0}
+              {project.count}
             </span>
           </button>
         ))}
