@@ -376,7 +376,7 @@ export function KanbanBoard() {
                 </button>
                 <div className="w-px h-6 bg-gray-700 mx-1" />
                 <button
-                  onClick={handleNewTask}
+                  onClick={() => handleNewTask()}
                   className="p-2 rounded transition-colors text-gray-400 hover:text-white hover:bg-gray-700"
                   title="Add Task"
                 >
