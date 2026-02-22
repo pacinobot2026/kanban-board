@@ -127,6 +127,20 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
             </button>
           </div>
           
+          {/* Progress Bar */}
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-gray-500">Progress</span>
+              <span className="text-xs text-gray-400 font-medium">{progress}%</span>
+            </div>
+            <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-purple-600 rounded-full transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+          
           {/* Tabs */}
           <div className="flex gap-4">
             {tabs.map((tab) => (
@@ -213,28 +227,6 @@ export function TaskDetail({ task, isOpen, onClose, onSave, onDelete, onArchive 
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                   className="w-full bg-gray-800 text-sm text-white rounded-lg px-3 py-2.5 border border-gray-700 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-
-              {/* Progress */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</label>
-                  <span className="text-sm text-white font-medium">{progress}%</span>
-                </div>
-                <div className="h-2 bg-gray-700 rounded-full overflow-hidden mb-3">
-                  <div 
-                    className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={progress}
-                  onChange={(e) => setProgress(parseInt(e.target.value))}
-                  className="w-full"
                 />
               </div>
             </div>
