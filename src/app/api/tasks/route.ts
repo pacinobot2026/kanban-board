@@ -30,8 +30,17 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
+    
+    // Handle updateAll action
+    if (body.action === 'updateAll' && body.tasks) {
+      await writeTasks(body.tasks);
+      return NextResponse.json({ success: true });
+    }
+    
+    // Handle regular task creation
     const tasks = await readTasks();
-    const newTask: Task = await request.json();
+    const newTask: Task = body;
     
     newTask.id = `task-${Date.now()}`;
     newTask.createdAt = new Date().toISOString();
