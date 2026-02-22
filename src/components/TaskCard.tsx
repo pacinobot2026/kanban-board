@@ -231,7 +231,7 @@ export function TaskCard({ task, onEdit, onToggleSubtask, onDelete, onArchive }:
         )}
         {!assignee && <div />}
 
-        {/* Dates */}
+        {/* Dates & Drag Handle */}
         <div className="flex items-center gap-3">
           {/* Date Created */}
           {task.createdAt && (
@@ -245,6 +245,15 @@ export function TaskCard({ task, onEdit, onToggleSubtask, onDelete, onArchive }:
               📅 {formatDate(task.dueDate)}
             </span>
           )}
+          {/* Drag Handle */}
+          <div 
+            className="cursor-grab active:cursor-grabbing text-gray-600 hover:text-gray-400 p-1"
+            title="Drag to reorder"
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
