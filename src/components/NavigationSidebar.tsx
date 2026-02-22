@@ -17,13 +17,16 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export function NavigationSidebar() {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   return (
     <div 
       className={`h-full bg-gray-900 border-r border-gray-800 flex flex-col transition-all duration-300 ${
         isExpanded ? 'w-48' : 'w-14'
       }`}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
     >
       {/* Toggle Button */}
       <button
@@ -47,13 +50,29 @@ export function NavigationSidebar() {
           <a
             key={item.id}
             href={item.href}
-            className={`flex items-center gap-3 px-3 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors ${
+            className={`relative flex items-center gap-3 px-3 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors group ${
               item.id === 'team' ? 'bg-purple-900/30 border-r-2 border-purple-500' : ''
             }`}
+            onMouseEnter={() => setHoveredItem(item.id)}
+            onMouseLeave={() => setHoveredItem(null)}
           >
-            <span className="text-xl">{item.icon}</span>
+            {/* Icon */}
+            <span className="text-xl flex-shrink-0">{item.icon}</span>
+            
+            {/* Label - shown when expanded */}
             {isExpanded && (
-              <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>
+              <span className="text-sm font-medium whitespace-nowrap overflow-hidden">
+                {item.label}
+              </span>
+            )}
+
+            {/* Tooltip - shown when collapsed and hovered */}
+            {!isExpanded && hoveredItem === item.id && (
+              <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg whitespace-nowrap z-50 shadow-lg border border-gray-700">
+                {item.label}
+                {/* Arrow */}
+                <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 border-4 border-transparent border-r-gray-800" />
+              </div>
             )}
           </a>
         ))}
@@ -62,9 +81,9 @@ export function NavigationSidebar() {
       {/* Logo/Bottom */}
       <div className="p-3 border-t border-gray-800">
         <div className="flex items-center gap-2">
-          <span className="text-xl">🎬</span>
+          <span className="text-xl flex-shrink-0">🎬</span>
           {isExpanded && (
-            <span className="text-sm font-bold text-white">Pacino</span>
+            <span className="text-sm font-bold text-white whitespace-nowrap overflow-hidden">Pacino</span>
           )}
         </div>
       </div>
