@@ -1,79 +1,65 @@
 'use client';
 
-interface Project {
-  id: string;
-  name: string;
-  icon: string;
-  count: number;
-}
+import { PROJECTS } from '@/types/task';
 
 interface ProjectSidebarProps {
-  projects: Project[];
   selectedProject: string | null;
   onSelectProject: (projectId: string | null) => void;
+  taskCounts: Record<string, number>;
 }
 
-export function ProjectSidebar({ projects, selectedProject, onSelectProject }: ProjectSidebarProps) {
+export function ProjectSidebar({ selectedProject, onSelectProject, taskCounts }: ProjectSidebarProps) {
+  const totalCount = Object.values(taskCounts).reduce((sum, count) => sum + count, 0);
+
   return (
-    <div className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
+    <div className="w-60 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
       {/* Header */}
-      <div className="p-6 border-b border-gray-800">
-        <h2 className="text-white font-bold text-lg flex items-center gap-2">
-          📁 Projects
-        </h2>
+      <div className="p-4 border-b border-gray-800">
+        <h2 className="text-white font-semibold">Projects</h2>
       </div>
 
       {/* Projects List */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-3">
         {/* All Projects */}
         <button
           onClick={() => onSelectProject(null)}
-          className={`w-full flex items-center justify-between px-4 py-3 rounded-lg mb-2 transition-all ${
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg mb-1 text-sm transition-colors ${
             selectedProject === null
-              ? 'bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30 text-white'
-              : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+              ? 'bg-purple-600/20 text-white'
+              : 'text-gray-400 hover:text-white hover:bg-gray-800'
           }`}
         >
-          <span className="flex items-center gap-3">
-            <span className="text-xl">📊</span>
-            <span className="font-medium">All Projects</span>
+          <span className="flex items-center gap-2">
+            <span>📁</span>
+            <span>All Projects</span>
           </span>
-          <span className="text-sm bg-gray-700 px-2 py-1 rounded-full">
-            {projects.reduce((sum, p) => sum + p.count, 0)}
+          <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full">
+            {totalCount}
           </span>
         </button>
 
-        <div className="h-px bg-gray-800 my-4" />
+        <div className="h-px bg-gray-800 my-2" />
 
         {/* Individual Projects */}
-        {projects.map(project => (
+        {PROJECTS.map(project => (
           <button
             key={project.id}
             onClick={() => onSelectProject(project.id)}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-lg mb-2 transition-all ${
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg mb-1 text-sm transition-colors ${
               selectedProject === project.id
-                ? 'bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30 text-white'
-                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+                ? 'bg-purple-600/20 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'
             }`}
           >
-            <span className="flex items-center gap-3">
-              <span className="text-xl">{project.icon}</span>
-              <span className="font-medium text-sm">{project.name}</span>
+            <span className="flex items-center gap-2">
+              <span>{project.icon}</span>
+              <span className="truncate">{project.name}</span>
             </span>
-            {project.count > 0 && (
-              <span className="text-xs bg-gray-700 px-2 py-1 rounded-full">
-                {project.count}
-              </span>
-            )}
+            <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full">
+              {taskCounts[project.id] || 0}
+            </span>
           </button>
         ))}
-      </div>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-800">
-        <div className="text-xs text-gray-500 text-center">
-          🎬 Powered by Pacino
-        </div>
       </div>
     </div>
   );
