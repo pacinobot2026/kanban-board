@@ -12,7 +12,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { Task, Status, COLUMNS, PROJECTS, TaskType } from '@/types/task';
+import { Task, Status, COLUMNS, PROJECTS, TaskType, TEAM_MEMBERS } from '@/types/task';
 import { Column } from './Column';
 import { TaskCard } from './TaskCard';
 import { TaskModal } from './TaskModal';
@@ -207,8 +207,9 @@ export function KanbanBoard() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="border-b border-gray-800 bg-gray-900/50 px-4 lg:px-6 py-4 flex-shrink-0">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left: Title & Project */}
+            <div className="flex items-center gap-3">
               {/* Mobile menu button */}
               <button
                 onClick={() => setShowProjectSidebar(true)}
@@ -219,37 +220,24 @@ export function KanbanBoard() {
                 </svg>
               </button>
               
-              <div className="min-w-0 flex-1">
-                <h1 className="text-lg lg:text-xl font-bold text-white flex items-center gap-2 truncate">
-                  📋 Projects
-                  {selectedProject && (
-                    <>
-                      <span className="hidden sm:inline text-sm text-gray-400">/</span>
-                      <span className="text-sm text-gray-400 truncate">
-                        {PROJECTS.find(p => p.id === selectedProject)?.name}
-                      </span>
-                    </>
-                  )}
-                </h1>
-                <p className="text-gray-400 text-xs sm:text-sm mt-1">
-                  {filteredTasks.length} tasks
+              <div>
+                <h1 className="text-2xl font-bold text-white">Team Board</h1>
+                <p className="text-gray-400 text-sm">
+                  {selectedProject ? PROJECTS.find(p => p.id === selectedProject)?.name : 'All Projects'} • {filteredTasks.length} tasks
                 </p>
               </div>
             </div>
 
-            {/* Team/OpenClaw Filter */}
-            <div className="hidden md:flex items-center bg-gray-800 rounded-lg p-1">
-              {(['all', 'team', 'openclaw'] as const).map((type) => (
+            {/* Center: Team Member Avatars */}
+            <div className="hidden md:flex items-center gap-2">
+              <span className="text-gray-500 text-sm mr-2">Team:</span>
+              {TEAM_MEMBERS.map((member) => (
                 <button
-                  key={type}
-                  onClick={() => setTypeFilter(type)}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                    typeFilter === type
-                      ? 'bg-purple-600 text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
+                  key={member.id}
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-medium text-sm hover:ring-2 hover:ring-purple-400 transition-all"
+                  title={member.name}
                 >
-                  {type === 'all' ? 'All' : type === 'team' ? 'Team' : 'OpenClaw'}
+                  {member.name.charAt(0)}
                 </button>
               ))}
             </div>
