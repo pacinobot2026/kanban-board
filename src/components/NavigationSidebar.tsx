@@ -13,7 +13,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'team', label: 'Team Board', icon: '👥', href: '/' },
   { id: 'openclaw', label: 'OpenClaw Board', icon: '🤖', href: '/openclaw' },
   { id: 'video', label: 'Video Board', icon: '🎬', href: 'https://vizard-clips-app.vercel.app' },
-  { id: 'control', label: 'Control Panel', icon: '🎛️', href: 'https://dashboard-rho-ivory.vercel.app' },
+  { id: 'control', label: 'Control Panel', icon: '🎛️', href: 'https://pacino-dashboard.vercel.app' },
 ];
 
 export function NavigationSidebar() {
