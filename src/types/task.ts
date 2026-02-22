@@ -27,6 +27,7 @@ export interface Task {
   statusLabel?: StatusLabel;
   daysSince?: number; // for delayed tasks
   subtasks?: Subtask[]; // NEW: checkable bullets
+  archived?: boolean;
   createdAt: string;
   updatedAt: string;
 }

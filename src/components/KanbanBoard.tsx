@@ -186,6 +186,24 @@ export function KanbanBoard() {
     }
   };
 
+  const handleArchiveTask = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const updatedTask = { ...task, archived: true };
+
+    try {
+      await fetch('/api/tasks', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTask),
+      });
+      fetchTasks();
+    } catch (error) {
+      console.error('Failed to archive task:', error);
+    }
+  };
+
   const handleSelectProject = (projectId: string | null) => {
     setSelectedProject(projectId);
     setShowProjectSidebar(false); // Close on mobile after selection
@@ -195,7 +213,8 @@ export function KanbanBoard() {
     const projectMatch = selectedProject ? t.project === selectedProject : true;
     const typeMatch = typeFilter === 'all' ? true : t.type === typeFilter;
     const assigneeMatch = selectedAssignee ? t.assignee === selectedAssignee : true;
-    return projectMatch && typeMatch && assigneeMatch;
+    const notArchived = !t.archived;
+    return projectMatch && typeMatch && assigneeMatch && notArchived;
   });
 
   const getTasksByStatus = (status: Status) => {
@@ -352,6 +371,7 @@ export function KanbanBoard() {
                     onEditTask={handleEditTask}
                     onToggleSubtask={handleToggleSubtask}
                     onDeleteTask={handleDeleteTask}
+                    onArchiveTask={handleArchiveTask}
                   />
                 ))}
               </div>

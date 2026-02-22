@@ -12,6 +12,7 @@ interface ColumnProps {
   onEditTask: (task: Task) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onDeleteTask?: (taskId: string) => void;
+  onArchiveTask?: (taskId: string) => void;
 }
 
 const COLUMN_STYLES: Record<Status, { border: string; badge: string; icon: string }> = {
@@ -22,7 +23,7 @@ const COLUMN_STYLES: Record<Status, { border: string; badge: string; icon: strin
   'done': { border: 'border-green-600/30', badge: 'bg-green-600/20 text-green-400', icon: '✅' },
 };
 
-export function Column({ id, title, tasks, onEditTask, onToggleSubtask, onDeleteTask }: ColumnProps) {
+export function Column({ id, title, tasks, onEditTask, onToggleSubtask, onDeleteTask, onArchiveTask }: ColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
   const style = COLUMN_STYLES[id];
 
@@ -48,7 +49,7 @@ export function Column({ id, title, tasks, onEditTask, onToggleSubtask, onDelete
       <div className="p-2 lg:p-3 space-y-2 lg:space-y-3 overflow-y-auto flex-1 custom-scrollbar">
         <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
           {tasks.map(task => (
-            <TaskCard key={task.id} task={task} onEdit={onEditTask} onToggleSubtask={onToggleSubtask} onDelete={onDeleteTask} />
+            <TaskCard key={task.id} task={task} onEdit={onEditTask} onToggleSubtask={onToggleSubtask} onDelete={onDeleteTask} onArchive={onArchiveTask} />
           ))}
         </SortableContext>
         
