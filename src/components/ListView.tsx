@@ -268,8 +268,8 @@ function SortableTask({ task, onEdit, onToggleSubtask, onArchive, formatDate, ge
     ? Math.round((completedSubtasks / totalSubtasks) * 100)
     : task.progress || 0;
   
-  const commentCount = task.comments?.length || 0;
-  const hasImages = task.attachments && task.attachments.length > 0;
+  const commentCount = 0; // Comments not in Task type yet
+  const hasImages = false; // Attachments not in Task type yet
 
   return (
     <div 
