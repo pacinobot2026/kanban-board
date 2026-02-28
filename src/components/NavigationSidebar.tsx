@@ -11,7 +11,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'command-center', label: 'Command Center', icon: '⚡', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
-  { id: 'custom-commands', label: 'Custom Commands', icon: '⌘', href: '#' },
+  { id: 'custom-commands', label: 'Custom Commands', icon: '⌘', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app/commands' },
   { id: 'team', label: 'Team Board', icon: '◉', href: '/' },
   { id: 'projects', label: 'Project Board', icon: '▦', href: '/' },
   { id: 'articles', label: 'Article Board', icon: '□', href: 'https://vizard-clips-app.vercel.app/articles' },
