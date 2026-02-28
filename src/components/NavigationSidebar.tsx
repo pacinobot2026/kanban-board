@@ -13,12 +13,12 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'command-center', label: 'Command Center', icon: '⚡', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
   { id: 'custom-commands', label: 'Custom Commands', icon: '⌘', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app/commands' },
   { id: 'team', label: 'Team Board', icon: '◉', href: '/' },
-  { id: 'projects', label: 'Project Board', icon: '▦', href: '/' },
+  { id: 'projects', label: 'Project Board', icon: '▦', href: 'https://vizard-clips-app.vercel.app/projects' },
   { id: 'articles', label: 'Article Board', icon: '□', href: 'https://vizard-clips-app.vercel.app/articles' },
-  { id: 'video', label: 'Video Cue System', icon: '▶', href: 'https://vizard-clips-app.vercel.app/dashboard' },
+  { id: 'video', label: 'Video Cue System', icon: '▶', href: 'https://vizard-clips-app.vercel.app/video-cue-system' },
   { id: 'ideas', label: 'Idea Board', icon: '◈', href: 'https://vizard-clips-app.vercel.app/ideas' },
-  { id: 'wishlist', label: 'Wish List', icon: '☆', href: '#' },
-  { id: 'resources', label: 'Resource Library', icon: '⊞', href: '#' },
+  { id: 'wishlist', label: 'Wish List', icon: '☆', href: 'https://vizard-clips-app.vercel.app/wish-list' },
+  { id: 'resources', label: 'Resource Library', icon: '⊞', href: 'https://vizard-clips-app.vercel.app/resource-library' },
   { id: 'bookmarks', label: 'Bookmark Manager', icon: '⊡', href: 'https://vizard-clips-app.vercel.app/bookmarks' },
 ];
 
