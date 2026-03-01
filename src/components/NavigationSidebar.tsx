@@ -10,8 +10,8 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'command-center', label: 'Command Center', icon: '⚡', href: 'https://www.nicelycontrol.com/command-center' },
-  { id: 'custom-commands', label: 'Custom Commands', icon: '⌘', href: 'https://www.nicelycontrol.com/commands' },
+  { id: 'command-center', label: 'Command Center', icon: '⚡', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
+  { id: 'custom-commands', label: 'Custom Commands', icon: '⌘', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app/commands' },
   { id: 'businesses', label: 'Business Board', icon: '◉', href: 'https://www.nicelycontrol.com/businesses' },
   { id: 'team', label: 'Team Board', icon: '▦', href: 'https://kanban-rho-ivory.vercel.app' },
   { id: 'vault', label: 'Operator Vault', icon: '□', href: 'https://www.nicelycontrol.com/vault' },
