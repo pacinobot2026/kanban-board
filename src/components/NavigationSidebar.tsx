@@ -10,16 +10,17 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'command-center', label: 'Command Center', icon: '⚡', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
-  { id: 'custom-commands', label: 'Custom Commands', icon: '⌘', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app/commands' },
-  { id: 'team', label: 'Team Board', icon: '◉', href: '/' },
-  { id: 'projects', label: 'Project Board', icon: '▦', href: 'https://vizard-clips-app.vercel.app/projects' },
-  { id: 'articles', label: 'Article Board', icon: '□', href: 'https://vizard-clips-app.vercel.app/articles' },
-  { id: 'video', label: 'Video Cue System', icon: '▶', href: 'https://vizard-clips-app.vercel.app/video-cue-system' },
-  { id: 'ideas', label: 'Idea Board', icon: '◈', href: 'https://vizard-clips-app.vercel.app/ideas' },
-  { id: 'wishlist', label: 'Wish List', icon: '☆', href: 'https://vizard-clips-app.vercel.app/wish-list' },
-  { id: 'resources', label: 'Resource Library', icon: '⊞', href: 'https://vizard-clips-app.vercel.app/resource-library' },
-  { id: 'bookmarks', label: 'Bookmark Manager', icon: '⊡', href: 'https://vizard-clips-app.vercel.app/bookmarks' },
+  { id: 'command-center', label: 'Command Center', icon: '⚡', href: 'https://www.nicelycontrol.com/command-center' },
+  { id: 'custom-commands', label: 'Custom Commands', icon: '⌘', href: 'https://www.nicelycontrol.com/commands' },
+  { id: 'businesses', label: 'Business Board', icon: '◉', href: 'https://www.nicelycontrol.com/businesses' },
+  { id: 'team', label: 'Team Board', icon: '▦', href: 'https://kanban-rho-ivory.vercel.app' },
+  { id: 'vault', label: 'Operator Vault', icon: '□', href: 'https://www.nicelycontrol.com/vault' },
+  { id: 'projects', label: 'Project Board', icon: '▶', href: 'https://www.nicelycontrol.com/projects' },
+  { id: 'articles', label: 'Article Board', icon: '◈', href: 'https://www.nicelycontrol.com/articles' },
+  { id: 'ideas', label: 'Idea Board', icon: '☆', href: 'https://www.nicelycontrol.com/ideas' },
+  { id: 'video', label: 'Video Cue', icon: '⊞', href: 'https://www.nicelycontrol.com/videocue' },
+  { id: 'wishlist', label: 'Wish List', icon: '⊡', href: 'https://www.nicelycontrol.com/wishlist' },
+  { id: 'resources', label: 'Resource Library', icon: '▣', href: 'https://www.nicelycontrol.com/resourcelibrary' },
 ];
 
 export function NavigationSidebar() {
